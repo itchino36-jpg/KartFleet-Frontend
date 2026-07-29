@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
+import { LoginForm } from "@/modules/auth/components/login-form";
+import { LoginHero } from "@/modules/auth/components/login-hero";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Iniciar sesión | KarFleet",
+  description: "Ingresa al centro operativo de KarFleet.",
+};
+
+export default function LoginPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <p>hola mera</p>
-    </div>
+    <main className="flex min-h-screen items-center justify-center bg-neutral-100 p-5">
+      <div className="flex min-h-screen w-full overflow-hidden rounded-[1.5rem] bg-white shadow-sm md:min-h-[calc(100vh-2.5rem)]">
+        <LoginHero />
+        <LoginForm />
+      </div>
+    </main>
   );
 }
