@@ -15,9 +15,6 @@ export default function DashboardLayout({
 
       <div className="flex min-h-screen flex-1 flex-col">
         <Header />
-        <button className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
-          +crear planilla
-        </button>
 
         <main className="flex-1 p-4 md:p-6">{children}</main>
         
