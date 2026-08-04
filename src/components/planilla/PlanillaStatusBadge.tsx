@@ -1,7 +1,8 @@
 import { CheckCircle2, LoaderCircle } from "lucide-react";
+import type { PlanillaStatus } from "@/modules/planilla/types/planilla.types";
 
 interface PlanillaStatusBadgeProps {
-  estado: "En proceso" | "Finalizada";
+  estado: PlanillaStatus;
 }
 
 export default function PlanillaStatusBadge({

@@ -13,6 +13,8 @@ export default function LoginPage() {
       <div className="flex min-h-screen w-full overflow-hidden rounded-[1.5rem] bg-white shadow-sm md:min-h-[calc(100vh-2.5rem)]">
         <LoginHero />
         <LoginForm />
+
+        
       </div>
     </main>
   );
