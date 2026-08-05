@@ -1,39 +1,36 @@
 "use client";
 
-type HoursEntry = {
+type TripHistoryEntry = {
   id: string;
-  arrivalOffice: string;
-  arrivalVehicle: string;
-  leaveWork: string;
-  returnVehicle: string;
-  hoursWorked: string;
-  effectiveHours: string;
+  includedTrips: number;
+  excludedTrips: number;
+  objective: string;
   createdAt: string;
 };
 
 type Props = {
-  entries: HoursEntry[];
+  entries: TripHistoryEntry[];
 };
 
-export default function HoursHistory({
+export default function TripHistory({
   entries,
 }: Props) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="mb-5">
         <h3 className="text-lg font-semibold text-slate-900">
-          Registros de horas
+          Registros de carreras
         </h3>
 
         <p className="mt-1 text-sm text-slate-500">
-          Historial de jornadas registradas.
+          Historial de carreras registradas.
         </p>
       </div>
 
       {entries.length === 0 ? (
         <div className="py-10 text-center">
           <p className="text-sm text-slate-500">
-            No existen registros de horas.
+            No existen registros de carreras.
           </p>
         </div>
       ) : (
@@ -46,19 +43,19 @@ export default function HoursHistory({
                 </th>
 
                 <th className="px-4 py-3 font-semibold">
-                  Llegada oficina
+                  Incluidas
                 </th>
 
                 <th className="px-4 py-3 font-semibold">
-                  Salida
+                  No incluidas
                 </th>
 
                 <th className="px-4 py-3 font-semibold">
-                  Horas trabajadas
+                  Total
                 </th>
 
                 <th className="px-4 py-3 font-semibold">
-                  Horas efectivas
+                  Objetivo
                 </th>
               </tr>
             </thead>
@@ -74,19 +71,20 @@ export default function HoursHistory({
                   </td>
 
                   <td className="px-4 py-3">
-                    {entry.arrivalOffice}
+                    {entry.includedTrips}
                   </td>
 
                   <td className="px-4 py-3">
-                    {entry.leaveWork}
+                    {entry.excludedTrips}
+                  </td>
+
+                  <td className="px-4 py-3 font-semibold">
+                    {entry.includedTrips +
+                      entry.excludedTrips}
                   </td>
 
                   <td className="px-4 py-3">
-                    {entry.hoursWorked} h
-                  </td>
-
-                  <td className="px-4 py-3">
-                    {entry.effectiveHours} h
+                    {entry.objective}
                   </td>
                 </tr>
               ))}

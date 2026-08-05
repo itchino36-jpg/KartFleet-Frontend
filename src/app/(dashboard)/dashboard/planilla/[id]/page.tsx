@@ -1,31 +1,30 @@
+
 "use client";
 
-import {useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useParams } from "next/navigation";
+import { toast } from "@/components/ui/toast";
 
 import PlanillaDetailHeader from "@/components/planilla/detail/PlanillaDetailHeader";
-import PlanillaGeneralInfo from "@/components/planilla/detail/PlanillaGeneralInfo";
 import PlanillaModuleSelector from "@/components/planilla/detail/PlanillaModuleSelector";
 import PlanillaModuleContent from "@/components/planilla/detail/PlanillaModuleContent";
-import PlanillaFinancialSummary from "@/components/planilla/detail/PlanillaFinancialSummary";
-import PlanillaFuelSummary from "@/components/planilla/detail/PlanillaFuelSummary";
-import PlanillaExpenseSummary from "@/components/planilla/detail/PlanillaExpenseSummary";
-import PlanillaLogSummary from "@/components/planilla/detail/PlanillaLogSummary";
 import PlanillaRegisterModal from "@/components/planilla/detail/PlanillaRegisterModal";
 import PlanillaModuleFormRenderer from "@/components/planilla/detail/PlanillaModuleFormRenderer";
+import HoursHistory from "@/components/planilla/history/HoursHistory";
+
+import type { TripHistoryEntry } from "@/modules/planilla/forms/TripTracking";
+import TripHistory from "@/components/planilla/history/TripHistory";
 
 import { planillaDetalle } from "@/modules/planilla/data/planilla.mock";
 import { accordionItems } from "@/modules/planilla/constants/planilla.constants";
-import { money } from "@/modules/planilla/constants/format.constants";
-
 
 export default function PlanillaDetailPage() {
-  const { id } = useParams<{ id:string }>();
+  const { id } = useParams<{ id: string }>();
 
   const planilla = planillaDetalle.find(
-    item => item.id === id
+    (item) => item.id === id
   );
 
   const [selectedSection, setSelectedSection] =
@@ -33,6 +32,11 @@ export default function PlanillaDetailPage() {
 
   const [activeModal, setActiveModal] =
     useState<string | null>(null);
+
+  const [tripEntries, setTripEntries] =
+    useState<TripHistoryEntry[]>([]);
+
+  const [hoursEntries, setHoursEntries] = useState<any[]>([]);
 
   if (!planilla) {
     return (
@@ -49,7 +53,6 @@ export default function PlanillaDetailPage() {
             <ArrowLeft className="h-4 w-4" />
             Volver al historial
           </Link>
-
         </div>
       </div>
     );
@@ -60,11 +63,6 @@ export default function PlanillaDetailPage() {
       (item) => item.id === activeModal
     ) ?? null;
 
-  const balance =
-    planilla.ingresos -
-    planilla.egresos -
-    planilla.combustible;
-
   const handleSelectSection = (id: string) => {
     setSelectedSection(id);
     setActiveModal(null);
@@ -73,60 +71,73 @@ export default function PlanillaDetailPage() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-2 py-2 md:px-4">
 
+      {/* ENCABEZADO */}
       <PlanillaDetailHeader
         planilla={planilla}
       />
 
-      <PlanillaGeneralInfo
-        planilla={planilla}
-        balance={balance}
-      />
-
+      {/* SELECTOR DE MÓDULOS */}
       <PlanillaModuleSelector
         items={accordionItems}
         selectedSection={selectedSection}
         onSelect={handleSelectSection}
       />
 
+      {/* CONTENIDO DEL MÓDULO */}
       <PlanillaModuleContent
         selectedSection={selectedSection}
         showForm={false}
         onAdd={() =>
           setActiveModal(selectedSection)
         }
-      />
+      /> 
+      {selectedSection === "hours-tracking" && (
+        <HoursHistory
+          entries={hoursEntries}
+        />
+      )}
+      {selectedSection === "trip-tracking" && (
+        <TripHistory
+          entries={tripEntries}
+        />
+      )}
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <PlanillaFinancialSummary
-          planilla={planilla}
-          money={money}
-        />
-        <PlanillaFuelSummary
-          planilla={planilla}
-        />
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <PlanillaExpenseSummary
-          expenses={planilla.gastos}
-          money={money}
-        />
-        <PlanillaLogSummary
-          items={planilla.bitacora}
-        />
-      </section>
-
+      {/* MODAL PARA AGREGAR REGISTROS */}
       <PlanillaRegisterModal
         open={!!modalItem}
         title={modalItem?.title ?? ""}
-        onClose={() =>
-          setActiveModal(null)
-        }
+        onClose={() => setActiveModal(null)}
       >
         <PlanillaModuleFormRenderer
           moduleId={activeModal ?? ""}
+          onSaved={(entry) => {
+            if (activeModal === "hours-tracking") {
+              setHoursEntries((prev) => [
+                ...prev,
+                entry,
+              ]);
+
+              toast.success(
+                "Registro de horas creado correctamente"
+              );
+            }
+
+            if (activeModal === "trip-tracking") {
+              setTripEntries((prev) => [
+                ...prev,
+                entry,
+              ]);
+
+              toast.success(
+                "Registro de carreras creado correctamente"
+              );
+            }
+
+            setActiveModal(null);
+          }}
         />
       </PlanillaRegisterModal>
+
     </div>
   );
 }

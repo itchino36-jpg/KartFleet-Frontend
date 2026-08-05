@@ -1,81 +1,65 @@
-import FuelManagement from "@/modules/planilla/forms/FuelManagement";
-import OperatingExpenses from "@/modules/planilla/forms/OperationalExpenses";
-import OperationalIncome from "@/modules/planilla/forms/OperationalIncome";
-import OperationLog from "@/modules/planilla/forms/OperationsLog";
-import HoursTracking from "@/modules/planilla/forms/TimeTracking";
-import TripTracking from "@/modules/planilla/forms/TripTracking";
 
 type Props = {
   selectedSection: string;
-  showForm: boolean;
   onAdd?: () => void;
 };
 
-function renderSectionContent(
-  id: string,
-  showForm: boolean,
-  onAdd?: () => void
-) {
-  switch (id) {
-    case "hours-tracking":
-      return (
-        <HoursTracking/>
-      );
-
-    case "trip-tracking":
-      return (
-        <TripTracking
-          showForm={showForm}
-          onAdd={onAdd}
-        />
-      );
-
-    case "operating-income":
-      return (
-        <OperationalIncome
-          showForm={showForm}
-          onAdd={onAdd}
-        />
-      );
-
-    case "operating-expenses":
-      return (
-        <OperatingExpenses
-          showForm={showForm}
-          onAdd={onAdd}
-        />
-      );
-
-    case "operations-log":
-      return (
-        <OperationLog/>
-      );
-
-    case "fuel-management":
-      return (
-        <FuelManagement
-          showForm={showForm}
-          onAdd={onAdd}
-        />
-      );
-
-    default:
-      return null;
-  }
-}
-
 export default function PlanillaModuleContent({
   selectedSection,
-  showForm,
   onAdd,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
-      {renderSectionContent(
-        selectedSection,
-        showForm,
-        onAdd
-      )}
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Módulo de planilla
+          </p>
+
+          <h2 className="mt-1 text-xl font-semibold text-slate-950">
+            {getModuleTitle(selectedSection)}
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Consulta la información registrada o agrega un nuevo registro.
+          </p>
+        </div>
+
+        {onAdd && (
+          <button
+            type="button"
+            onClick={onAdd}
+            className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            + Agregar
+          </button>
+        )}
+      </div>
     </div>
   );
+}
+
+function getModuleTitle(id: string) {
+  switch (id) {
+    case "hours-tracking":
+      return "Control de horas";
+
+    case "trip-tracking":
+      return "Control de carreras";
+
+    case "operating-income":
+      return "Ingresos operativos";
+
+    case "operating-expenses":
+      return "Egresos operativos";
+
+    case "operations-log":
+      return "Bitácora operativa";
+
+    case "fuel-management":
+      return "Control de combustible";
+
+    default:
+      return "Módulo";
+  }
 }

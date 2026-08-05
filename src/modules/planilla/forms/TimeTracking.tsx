@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "@/components/ui/toast";
 
 import {
   Alert,
@@ -244,6 +245,10 @@ export default function HoursTracking({
      */
     onSaved?.(savedEntry);
 
+    toast.success(
+      "Registro de horas creado correctamente"
+    );
+
     reset(defaultHoursValues);
   };
 
@@ -287,10 +292,17 @@ export default function HoursTracking({
 
       {/* FORMULARIO */}
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-8"
-      >
+        <form
+          onSubmit={handleSubmit(
+            onSubmit,
+            () => {
+              toast.error(
+                "Revisa los datos obligatorios del formulario"
+              );
+            }
+          )}
+          className="space-y-8"
+        >
         {/* HORARIOS */}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">

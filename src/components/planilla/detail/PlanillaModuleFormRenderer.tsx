@@ -7,17 +7,27 @@ import FuelManagement from "@/modules/planilla/forms/FuelManagement";
 
 type Props = {
   moduleId: string;
+  onSaved?: (entry: any) => void;
 };
 
 export default function PlanillaModuleFormRenderer({
   moduleId,
+  onSaved,
 }: Props) {
   switch (moduleId) {
     case "hours-tracking":
-      return <HoursTracking />;
+      return (
+        <HoursTracking
+          onSaved={onSaved}
+        />
+      );
 
     case "trip-tracking":
-      return <TripTracking />;
+      return (
+        <TripTracking
+          onSaved={onSaved}
+        />
+      );
 
     case "operating-income":
       return <OperationalIncome />;
