@@ -121,7 +121,7 @@ export function LoginForm() {
         </div>
 
         <p className="mt-8 text-center text-sm text-white/70">
-          ¿Necesitas ayuda?{" "}
+          ¿Necesitas ayuda?
           <Link
             href="/contact-admin"
             className="font-medium text-white underline underline-offset-2 hover:text-white/80"

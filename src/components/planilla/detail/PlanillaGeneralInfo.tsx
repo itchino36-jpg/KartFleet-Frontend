@@ -55,7 +55,7 @@ export default function PlanillaGeneralInfo({
         </p>
 
         <p className="text-sm text-slate-600">
-          Ingreso por carrera:{" "}
+          Ingreso por carrera:
           {money.format(planilla.ingresoPorCarrera)}
         </p>
       </div>

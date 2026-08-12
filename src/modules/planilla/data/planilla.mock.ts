@@ -7,7 +7,7 @@ export const planillaDetalle: Planilla[] = [
     fecha: "01 Ago 2026",
     conductor: "Mario Chino",
     movil: "MC-12",
-    estado: "En proceso",
+    estado: "Finalizada",
 
     horasTrabajadas: "8.5 h",
     horasNoTrabajadas: "1.5 h",

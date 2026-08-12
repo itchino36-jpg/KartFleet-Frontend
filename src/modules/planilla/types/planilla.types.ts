@@ -13,6 +13,7 @@ export interface Planilla {
   id: string;
   folio: string;
   fecha: string;
+  arrivalOffice: string;
   conductor: string;
   movil: string;
   estado: PlanillaStatus;

@@ -1,5 +1,4 @@
-import { BriefcaseBusiness } from 'lucide-react';
-
+import { BriefcaseBusiness } from "lucide-react";
 
 export const sidebarItems = [
   {
@@ -11,8 +10,17 @@ export const sidebarItems = [
     path: "/dashboard/planilla",
   },
   {
-    icon: <BriefcaseBusiness />,
-    title: "Investor",
-    path: "/dashboard/investor",
+    title: "Inversionista",
+    path: "/dashboard/Inversionista",
+    children: [
+      {
+        title: "Usuarios",
+        path: "/dashboard/Inversionista",
+      },
+      {
+        title: "Vehículos",
+        path: "/dashboard/Inversionista/vehiculos",
+      },
+    ],
   },
 ];

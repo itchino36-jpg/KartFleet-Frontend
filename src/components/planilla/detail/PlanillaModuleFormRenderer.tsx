@@ -1,5 +1,5 @@
+
 import HoursTracking from "@/modules/planilla/forms/TimeTracking";
-import TripTracking from "@/modules/planilla/forms/TripTracking";
 import OperatingExpenses from "@/modules/planilla/forms/OperationalExpenses";
 import OperationalIncome from "@/modules/planilla/forms/OperationalIncome";
 import OperationLog from "@/modules/planilla/forms/OperationsLog";
@@ -22,24 +22,33 @@ export default function PlanillaModuleFormRenderer({
         />
       );
 
-    case "trip-tracking":
+    case "operating-income":
       return (
-        <TripTracking
+        <OperationalIncome
           onSaved={onSaved}
         />
       );
 
-    case "operating-income":
-      return <OperationalIncome />;
-
     case "operating-expenses":
-      return <OperatingExpenses />;
+      return (
+        <OperatingExpenses
+          onSaved={onSaved}
+        />
+      );
 
     case "operations-log":
-      return <OperationLog />;
+      return (
+        <OperationLog
+          onSaved={onSaved}
+        />
+      );
 
     case "fuel-management":
-      return <FuelManagement />;
+      return (
+        <FuelManagement
+          onSaved={onSaved}
+        />
+      );
 
     default:
       return null;

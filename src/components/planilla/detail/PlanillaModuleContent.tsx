@@ -8,11 +8,13 @@ export default function PlanillaModuleContent({
   selectedSection,
   onAdd,
 }: Props) {
+  const isTripTracking = selectedSection === "trip-tracking";
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+          <p className="text-sm font-medium text-slate-500">
             Módulo de planilla
           </p>
 
@@ -21,11 +23,13 @@ export default function PlanillaModuleContent({
           </h2>
 
           <p className="mt-1 text-sm text-slate-500">
-            Consulta la información registrada o agrega un nuevo registro.
+            {isTripTracking
+              ? "Consulta el total de carreras según su origen."
+              : "Consulta la información registrada o agrega un nuevo registro."}
           </p>
         </div>
 
-        {onAdd && (
+        {onAdd && !isTripTracking && (
           <button
             type="button"
             onClick={onAdd}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -11,14 +10,24 @@ import PlanillaDetailHeader from "@/components/planilla/detail/PlanillaDetailHea
 import PlanillaModuleSelector from "@/components/planilla/detail/PlanillaModuleSelector";
 import PlanillaModuleContent from "@/components/planilla/detail/PlanillaModuleContent";
 import PlanillaRegisterModal from "@/components/planilla/detail/PlanillaRegisterModal";
+import PlanillaDetailContent from "@/components/planilla/detail/PlanillaDetailContent";
 import PlanillaModuleFormRenderer from "@/components/planilla/detail/PlanillaModuleFormRenderer";
-import HoursHistory from "@/components/planilla/history/HoursHistory";
 
-import type { TripHistoryEntry } from "@/modules/planilla/forms/TripTracking";
-import TripHistory from "@/components/planilla/history/TripHistory";
+import type { FuelHistoryEntry } from "@/modules/planilla/forms/FuelManagement";
+import type { HoursHistoryEntry } from "@/modules/planilla/forms/TimeTracking";
+import type { IncomeHistoryEntry } from "@/modules/planilla/forms/OperationalIncome";
+import type { ExpenseHistoryEntry } from "@/modules/planilla/forms/OperationalExpenses";
+import type { ActivityLogEntry } from "@/modules/planilla/forms/OperationsLog";
 
 import { planillaDetalle } from "@/modules/planilla/data/planilla.mock";
 import { accordionItems } from "@/modules/planilla/constants/planilla.constants";
+
+type PlanillaHistoryEntry =
+  | HoursHistoryEntry
+  | IncomeHistoryEntry
+  | ExpenseHistoryEntry
+  | ActivityLogEntry
+  | FuelHistoryEntry;
 
 export default function PlanillaDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -28,21 +37,31 @@ export default function PlanillaDetailPage() {
   );
 
   const [selectedSection, setSelectedSection] =
-    useState<string>("hours-tracking");
+    useState("hours-tracking");
 
   const [activeModal, setActiveModal] =
     useState<string | null>(null);
 
-  const [tripEntries, setTripEntries] =
-    useState<TripHistoryEntry[]>([]);
+  const [incomeEntries, setIncomeEntries] =
+    useState<IncomeHistoryEntry[]>([]);
 
-  const [hoursEntries, setHoursEntries] = useState<any[]>([]);
+  const [expenseEntries, setExpenseEntries] =
+    useState<ExpenseHistoryEntry[]>([]);
+
+  const [activityLogEntries, setActivityLogEntries] =
+    useState<ActivityLogEntry[]>([]);
+
+  const [hoursEntries, setHoursEntries] =
+    useState<HoursHistoryEntry[]>([]);
+
+  const [fuelEntries, setFuelEntries] =
+    useState<FuelHistoryEntry[]>([]);
 
   if (!planilla) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold text-slate-950">
+          <h1 className="text-xl font-semibold text-slate-950">
             Planilla no encontrada
           </h1>
 
@@ -68,15 +87,79 @@ export default function PlanillaDetailPage() {
     setActiveModal(null);
   };
 
-  return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-2 py-2 md:px-4">
+  const handleRegisterSaved = (
+    entry: PlanillaHistoryEntry
+  ) => {
+    switch (activeModal) {
+      case "hours-tracking":
+        setHoursEntries((prev) => [
+          ...prev,
+          entry as HoursHistoryEntry,
+        ]);
 
+        toast.success(
+          "Registro de horas creado correctamente"
+        );
+        break;
+
+      case "operating-income":
+        setIncomeEntries((prev) => [
+          ...prev,
+          entry as IncomeHistoryEntry,
+        ]);
+
+        toast.success(
+          "Ingreso operativo creado correctamente"
+        );
+        break;
+
+      case "operating-expenses":
+        setExpenseEntries((prev) => [
+          ...prev,
+          entry as ExpenseHistoryEntry,
+        ]);
+
+        toast.success(
+          "Egreso operativo creado correctamente"
+        );
+        break;
+
+      case "operations-log":
+        setActivityLogEntries((prev) => [
+          ...prev,
+          entry as ActivityLogEntry,
+        ]);
+
+        toast.success(
+          "Actividad de bitácora creada correctamente"
+        );
+        break;
+
+      case "fuel-management":
+        setFuelEntries((prev) => [
+          ...prev,
+          entry as FuelHistoryEntry,
+        ]);
+
+        toast.success(
+          "Registro de combustible creado correctamente"
+        );
+        break;
+          }
+
+    setActiveModal(null);
+  };
+
+  return (
+    <div className="space-y-6">
       {/* ENCABEZADO */}
+
       <PlanillaDetailHeader
         planilla={planilla}
       />
 
       {/* SELECTOR DE MÓDULOS */}
+
       <PlanillaModuleSelector
         items={accordionItems}
         selectedSection={selectedSection}
@@ -84,25 +167,27 @@ export default function PlanillaDetailPage() {
       />
 
       {/* CONTENIDO DEL MÓDULO */}
+
       <PlanillaModuleContent
         selectedSection={selectedSection}
-        showForm={false}
         onAdd={() =>
           setActiveModal(selectedSection)
         }
-      /> 
-      {selectedSection === "hours-tracking" && (
-        <HoursHistory
-          entries={hoursEntries}
-        />
-      )}
-      {selectedSection === "trip-tracking" && (
-        <TripHistory
-          entries={tripEntries}
-        />
-      )}
+      />
+
+      {/* CONTENIDO DINÁMICO DE LA PLANILLA */}
+
+      <PlanillaDetailContent
+        selectedSection={selectedSection}
+        hoursEntries={hoursEntries}
+        incomeEntries={incomeEntries}
+        expenseEntries={expenseEntries}
+        activityLogEntries={activityLogEntries}
+        fuelEntries={fuelEntries}
+      />
 
       {/* MODAL PARA AGREGAR REGISTROS */}
+
       <PlanillaRegisterModal
         open={!!modalItem}
         title={modalItem?.title ?? ""}
@@ -110,34 +195,9 @@ export default function PlanillaDetailPage() {
       >
         <PlanillaModuleFormRenderer
           moduleId={activeModal ?? ""}
-          onSaved={(entry) => {
-            if (activeModal === "hours-tracking") {
-              setHoursEntries((prev) => [
-                ...prev,
-                entry,
-              ]);
-
-              toast.success(
-                "Registro de horas creado correctamente"
-              );
-            }
-
-            if (activeModal === "trip-tracking") {
-              setTripEntries((prev) => [
-                ...prev,
-                entry,
-              ]);
-
-              toast.success(
-                "Registro de carreras creado correctamente"
-              );
-            }
-
-            setActiveModal(null);
-          }}
+          onSaved={handleRegisterSaved}
         />
       </PlanillaRegisterModal>
-
     </div>
   );
 }
