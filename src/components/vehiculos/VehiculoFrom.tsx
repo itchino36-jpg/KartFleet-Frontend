@@ -1,65 +1,61 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "@/components/ui/toast";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
 
 interface VehiculoFormProps {
   inversionistas: Inversionista[];
+  fixedInversionista?: Inversionista;
   vehiculoInicial?: Vehiculo;
-  onSave: (vehiculo: Vehiculo) => void;
+  onSave: (vehiculo: Omit<Vehiculo, "id">) => void;
   onCancel: () => void;
 }
 
 export default function VehiculoForm({
   inversionistas,
+  fixedInversionista,
   vehiculoInicial,
   onSave,
   onCancel,
 }: VehiculoFormProps) {
-  const [inversionistaId, setInversionistaId] = useState("");
-  const [placa, setPlaca] = useState("");
-  const [marca, setMarca] = useState("");
-  const [modelo, setModelo] = useState("");
-  const [año, setAño] = useState("");
-  const [color, setColor] = useState("");
-  const [tipo, setTipo] = useState("");
+  const [inversionistaId, setInversionistaId] = useState(
+    vehiculoInicial?.inversionistaId ?? fixedInversionista?.id ?? ""
+  );
+  const [placa, setPlaca] = useState(vehiculoInicial?.placa ?? "");
+  const [marca, setMarca] = useState(vehiculoInicial?.marca ?? "");
+  const [modelo, setModelo] = useState(vehiculoInicial?.modelo ?? "");
+  const [año, setAño] = useState(vehiculoInicial?.año ?? "");
+  const [color, setColor] = useState(vehiculoInicial?.color ?? "");
+  const [tipo, setTipo] = useState(vehiculoInicial?.tipo ?? "");
 
   const modoEdicion = Boolean(vehiculoInicial);
-
-  useEffect(() => {
-    if (vehiculoInicial) {
-      setInversionistaId(vehiculoInicial.inversionistaId);
-      setPlaca(vehiculoInicial.placa);
-      setMarca(vehiculoInicial.marca);
-      setModelo(vehiculoInicial.modelo);
-      setAño(vehiculoInicial.año);
-      setColor(vehiculoInicial.color);
-      setTipo(vehiculoInicial.tipo);
-      return;
-    }
-
-    setInversionistaId("");
-    setPlaca("");
-    setMarca("");
-    setModelo("");
-    setAño("");
-    setColor("");
-    setTipo("");
-  }, [vehiculoInicial]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const vehiculo: Vehiculo = {
-      id: vehiculoInicial?.id ?? crypto.randomUUID(),
+    if (
+      !inversionistaId.trim() ||
+      !placa.trim() ||
+      !marca.trim() ||
+      !modelo.trim() ||
+      !año.trim() ||
+      !color.trim() ||
+      !tipo.trim()
+    ) {
+      toast.error("Todos los campos del vehículo son obligatorios");
+      return;
+    }
+
+    const vehiculo: Omit<Vehiculo, "id"> = {
       inversionistaId,
-      placa,
-      marca,
-      modelo,
-      año,
-      color,
-      tipo,
+      placa: placa.trim().toUpperCase(),
+      marca: marca.trim(),
+      modelo: modelo.trim(),
+      año: año.trim(),
+      color: color.trim(),
+      tipo: tipo.trim(),
     };
 
     onSave(vehiculo);
@@ -69,6 +65,7 @@ export default function VehiculoForm({
     <form onSubmit={handleSubmit}>
       <div className="space-y-5 p-6">
         {/* INVERSIONISTA */}
+        {!fixedInversionista && (
         <label className="block space-y-1.5">
           <span className="text-sm font-medium text-slate-700">
             Inversionista
@@ -91,10 +88,21 @@ export default function VehiculoForm({
             ))}
           </select>
         </label>
+        )}
+
+        {fixedInversionista && (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs font-medium text-slate-500">
+              Inversionista
+            </p>
+            <p className="mt-1 text-sm font-semibold text-slate-950">
+              {fixedInversionista.nombre}
+            </p>
+          </div>
+        )}
 
         {/* DATOS DEL VEHÍCULO */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {/* PLACA */}
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">
               Placa
@@ -109,7 +117,6 @@ export default function VehiculoForm({
             />
           </label>
 
-          {/* MARCA */}
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">
               Marca
@@ -124,7 +131,6 @@ export default function VehiculoForm({
             />
           </label>
 
-          {/* MODELO */}
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">
               Modelo
@@ -139,7 +145,6 @@ export default function VehiculoForm({
             />
           </label>
 
-          {/* AÑO */}
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">
               Año
@@ -156,7 +161,6 @@ export default function VehiculoForm({
             />
           </label>
 
-          {/* COLOR */}
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">
               Color
@@ -171,7 +175,6 @@ export default function VehiculoForm({
             />
           </label>
 
-          {/* TIPO */}
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">
               Tipo de vehículo

@@ -30,25 +30,12 @@ export default function InversionistasTable({
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-slate-200 text-slate-500">
-            <th className="px-3 py-3 font-medium">
-              Nombre
-            </th>
-
-            <th className="px-3 py-3 font-medium">
-              Documento
-            </th>
-
-            <th className="px-3 py-3 font-medium">
-              Teléfono
-            </th>
-
-            <th className="px-3 py-3 font-medium">
-              Correo
-            </th>
-
-            <th className="px-3 py-3 font-medium">
-              Acciones
-            </th>
+            <th className="px-3 py-3 font-medium">Nombre</th>
+            <th className="px-3 py-3 font-medium">Documento</th>
+            <th className="px-3 py-3 font-medium">Telefono</th>
+            <th className="px-3 py-3 font-medium">Correo</th>
+            <th className="px-3 py-3 font-medium">Acciones</th>
+        
           </tr>
         </thead>
 
@@ -56,24 +43,12 @@ export default function InversionistasTable({
           {inversionistas.map((inversionista) => (
             <tr
               key={inversionista.id}
-              className="border-b border-slate-100 last:border-0"
-            >
-              <td className="px-3 py-3 font-medium text-slate-900">
-                {inversionista.nombre}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {inversionista.documento}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {inversionista.telefono}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {inversionista.correo}
-              </td>
-
+              className="border-b border-slate-100 last:border-0">
+              <td className="px-3 py-3 font-medium text-slate-900">{inversionista.nombre}</td>
+              <td className="px-3 py-3 text-slate-600">{inversionista.documento}</td>
+              <td className="px-3 py-3 text-slate-600">{inversionista.telefono}</td>
+              <td className="px-3 py-3 text-slate-600">{inversionista.correo}</td>
+              
               <td className="px-3 py-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <button

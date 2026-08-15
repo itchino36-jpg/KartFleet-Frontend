@@ -17,7 +17,7 @@ export function LoginForm() {
   } = useLoginForm();
 
   return (
-    <div className="flex w-full flex-col justify-center bg-[#151310] px-10 py-12 text-white md:w-1/2 lg:px-28">
+    <div className="flex w-full flex-col justify-center bg-slate-950 px-10 py-12 text-white md:w-1/2 lg:px-28">
       <div className="mx-auto w-full max-w-md">
         <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-white/60">
           ACCESO SEGURO
@@ -108,7 +108,7 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-[#151310] transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <LogIn size={16} />
             {isSubmitting ? "Ingresando..." : "Ingresar"}

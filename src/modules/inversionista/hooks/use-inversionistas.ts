@@ -32,11 +32,20 @@ export function useInversionistas() {
     setInversionistas(updated);
   };
 
-  const addInversionista = (inversionista: Inversionista) => {
+  const addInversionista = (
+    datos: Omit<Inversionista, "id">
+  ) => {
+    const nuevoInversionista: Inversionista = {
+      id: crypto.randomUUID(),
+      ...datos,
+    };
+
     saveInversionistas([
       ...inversionistas,
-      inversionista,
+      nuevoInversionista,
     ]);
+
+    return nuevoInversionista;
   };
 
   const updateInversionista = (
@@ -60,11 +69,18 @@ export function useInversionistas() {
     saveInversionistas(updated);
   };
 
+  const getInversionistaById = (id: string) => {
+    return inversionistas.find(
+      (inversionista) => inversionista.id === id
+    );
+  };
+
   return {
     inversionistas,
     isLoading,
     addInversionista,
     updateInversionista,
     deleteInversionista,
+    getInversionistaById,
   };
 }

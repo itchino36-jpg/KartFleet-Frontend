@@ -2,59 +2,77 @@
 
 import { useEffect, useState } from "react";
 import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
-
-const STORAGE_KEY = "vehiculos";
+import {
+  getVehiculos,
+  createVehiculo,
+  updateVehiculo,
+  deleteVehiculo,
+} from "@/modules/inversionista/services/vehiculo.service";
 
 export function useVehiculos() {
   const [vehiculos, setVehiculos] = useState<Vehiculo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const savedVehiculos = getVehiculos();
 
-    if (saved) {
-      try {
-        setVehiculos(JSON.parse(saved));
-      } catch {
-        setVehiculos([]);
-      }
-    }
-
+    setVehiculos(savedVehiculos);
     setIsLoading(false);
   }, []);
 
-  const saveVehiculos = (updated: Vehiculo[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    setVehiculos(updated);
+  const addVehiculo = (
+    vehiculo: Omit<Vehiculo, "id">
+  ) => {
+    const nuevoVehiculo = createVehiculo(vehiculo);
+
+    setVehiculos([
+      ...vehiculos,
+      nuevoVehiculo,
+    ]);
   };
 
-  const addVehiculo = (vehiculo: Vehiculo) => {
-    saveVehiculos([...vehiculos, vehiculo]);
-  };
+  const updateVehiculoById = (
+    id: string,
+    data: Omit<Vehiculo, "id">
+  ) => {
+    const vehiculoActualizado = updateVehiculo(id, data);
 
-  const updateVehiculo = (vehiculoActualizado: Vehiculo) => {
-    const updated = vehiculos.map((vehiculo) =>
-      vehiculo.id === vehiculoActualizado.id
-        ? vehiculoActualizado
-        : vehiculo
+    if (!vehiculoActualizado) {
+      return null;
+    }
+
+    setVehiculos((actuales) =>
+      actuales.map((vehiculo) =>
+        vehiculo.id === id
+          ? vehiculoActualizado
+          : vehiculo
+      )
     );
 
-    saveVehiculos(updated);
+    return vehiculoActualizado;
   };
 
-  const deleteVehiculo = (id: string) => {
-    const updated = vehiculos.filter(
-      (vehiculo) => vehiculo.id !== id
+  const removeVehiculo = (id: string) => {
+    const eliminado = deleteVehiculo(id);
+
+    if (!eliminado) {
+      return false;
+    }
+
+    setVehiculos((actuales) =>
+      actuales.filter(
+        (vehiculo) => vehiculo.id !== id
+      )
     );
 
-    saveVehiculos(updated);
+    return true;
   };
 
   return {
     vehiculos,
     isLoading,
     addVehiculo,
-    updateVehiculo,
-    deleteVehiculo,
+    updateVehiculo: updateVehiculoById,
+    deleteVehiculo: removeVehiculo,
   };
 }

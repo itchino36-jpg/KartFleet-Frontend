@@ -1,6 +1,6 @@
 
-export const money = new Intl.NumberFormat("es-CL", {
+export const money = new Intl.NumberFormat("es-BO", {
   style: "currency",
-  currency: "CLP",
+  currency: "BOB",
   maximumFractionDigits: 0,
 });

@@ -7,7 +7,6 @@ import { AlertCircleIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "@/components/ui/toast";
 
 import {
@@ -15,152 +14,23 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert";
+import TimeField from "./time-tracking/TimeField";
+import TimeMetrics from "./time-tracking/TimeMetrics";
+import {
+  defaultHoursValues,
+  hoursSchema,
+} from "./time-tracking/time-tracking.schema";
+import { getHoursMetrics } from "./time-tracking/time-tracking.utils";
+import type {
+  HoursFormValues,
+  HoursHistoryEntry,
+} from "./time-tracking/time-tracking.types";
 
-const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
-
-const hoursSchema = z.object({
-  arrivalOffice: z
-    .string()
-    .regex(timeRegex, "Formato HH:MM"),
-
-  arrivalVehicle: z
-    .string()
-    .regex(timeRegex, "Formato HH:MM"),
-
-  leaveWork: z
-    .string()
-    .regex(timeRegex, "Formato HH:MM"),
-
-  returnVehicle: z
-    .string()
-    .regex(timeRegex, "Formato HH:MM"),
-
-  observations: z
-    .string()
-    .max(500, "Máximo 500 caracteres")
-    .optional(),
-});
-
-export type HoursFormValues = z.infer<typeof hoursSchema>;
-
-export type HoursHistoryEntry = HoursFormValues & {
-  id: string;
-  createdAt: string;
-  hoursWorked: string;
-  effectiveHours: string;
-};
-
-const defaultHoursValues: HoursFormValues = {
-  arrivalOffice: "08:00",
-  arrivalVehicle: "08:20",
-  leaveWork: "18:00",
-  returnVehicle: "18:20",
-  observations: "",
-};
-
-const parseTime = (value: string) => {
-  const [hours, minutes] = value.split(":").map(Number);
-
-  return hours * 60 + minutes;
-};
-
-const formatDuration = (minutes: number) => {
-  return (minutes / 60).toFixed(2);
-};
-
-export const getHoursMetrics = (
-  values: Pick<
-    HoursFormValues,
-    | "arrivalOffice"
-    | "arrivalVehicle"
-    | "leaveWork"
-    | "returnVehicle"
-  >
-) => {
-  const times = [
-    values.arrivalOffice,
-    values.arrivalVehicle,
-    values.leaveWork,
-    values.returnVehicle,
-  ];
-
-  if (!times.every((value) => timeRegex.test(value ?? ""))) {
-    return {
-      hoursWorked: "0.00",
-      effectiveHours: "0.00",
-    };
-  }
-
-  const officeMinutes = parseTime(
-    values.arrivalOffice ?? "00:00"
-  );
-
-  const vehicleMinutes = parseTime(
-    values.arrivalVehicle ?? "00:00"
-  );
-
-  const leaveMinutes = parseTime(
-    values.leaveWork ?? "00:00"
-  );
-
-  const returnMinutes = parseTime(
-    values.returnVehicle ?? "00:00"
-  );
-
-  const hoursWorked = Math.max(
-    0,
-    leaveMinutes - officeMinutes
-  );
-
-  const effectiveHours = Math.max(
-    0,
-    returnMinutes - vehicleMinutes
-  );
-
-  return {
-    hoursWorked: formatDuration(hoursWorked),
-    effectiveHours: formatDuration(effectiveHours),
-  };
-};
-
-function TimeField({
-  label,
-  registration,
-  error,
-  disabled,
-}: {
-  label: string;
-
-  registration: ReturnType<
-    ReturnType<typeof useForm<HoursFormValues>>["register"]
-  >;
-
-  error?: string;
-
-  disabled?: boolean;
-}) {
-  return (
-    <label className="block space-y-1.5">
-      <span className="text-[13px] font-medium text-slate-600">
-        {label}
-      </span>
-
-      <input
-        type="time"
-        step="60"
-        {...registration}
-        disabled={disabled}
-        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5 disabled:cursor-not-allowed disabled:opacity-50 sm:text-[15px]"
-      />
-
-      {error && (
-        <p className="text-xs font-medium text-rose-600">
-          {error}
-        </p>
-      )}
-    </label>
-  );
-}
+export type {
+  HoursFormValues,
+  HoursHistoryEntry,
+} from "./time-tracking/time-tracking.types";
+export { getHoursMetrics } from "./time-tracking/time-tracking.utils";
 
 type HoursTrackingProps = {
   onSaved?: (entry: HoursHistoryEntry) => void;
@@ -337,35 +207,10 @@ export default function HoursTracking({
 
         {/* RESUMEN DE HORAS */}
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="rounded-2xl bg-slate-900 p-4 sm:p-5">
-            <p className="text-xs font-medium text-slate-300 sm:text-sm">
-              Horas trabajadas
-            </p>
-
-            <p className="mt-1.5 text-2xl font-semibold text-white sm:mt-2 sm:text-3xl">
-              {metrics.hoursWorked}
-
-              <span className="ml-1 text-sm font-normal text-slate-400">
-                h
-              </span>
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-            <p className="text-xs font-medium text-slate-500 sm:text-sm">
-              Horas efectivas
-            </p>
-
-            <p className="mt-1.5 text-2xl font-semibold text-slate-900 sm:mt-2 sm:text-3xl">
-              {metrics.effectiveHours}
-
-              <span className="ml-1 text-sm font-normal text-slate-400">
-                h
-              </span>
-            </p>
-          </div>
-        </div>
+        <TimeMetrics
+          hoursWorked={metrics.hoursWorked}
+          effectiveHours={metrics.effectiveHours}
+        />
 
         {/* OBSERVACIONES */}
 

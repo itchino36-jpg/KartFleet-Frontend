@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
+import { money } from "@/modules/planilla/constants/format.constants";
 
 interface PlanillaTableProps {
   planillas: Array<{
@@ -26,12 +27,6 @@ interface PlanillaTableProps {
   }>;
   
 }
-
-const money = new Intl.NumberFormat("es-CL", {
-  style: "currency",
-  currency: "CLP",
-  maximumFractionDigits: 0,
-});
 
 export default function PlanillaTable({ planillas }: PlanillaTableProps) {
   return (

@@ -5,6 +5,7 @@ import {
   Route,
   Wallet,
 } from "lucide-react";
+import { money } from "@/modules/planilla/constants/format.constants";
 
 interface PlanillaSummaryProps {
   totalPlanillas: number;
@@ -16,12 +17,6 @@ interface PlanillaSummaryProps {
   egresos: number;
   combustible: number;
 }
-
-const money = new Intl.NumberFormat("es-CL", {
-  style: "currency",
-  currency: "CLP",
-  maximumFractionDigits: 0,
-});
 
 export default function PlanillaSummary({
   totalPlanillas,
@@ -90,7 +85,7 @@ export default function PlanillaSummary({
         );
       })}
 
-      <div className="col-span-full flex items-center justify-between gap-4 rounded-2xl bg-[#151310] p-5 text-white shadow-sm">
+      <div className="col-span-full flex items-center justify-between gap-4 rounded-2xl bg-slate-950 p-5 text-white shadow-sm">
         <div>
           <p className="text-sm text-slate-300">Balance del turno</p>
           <p className="text-2xl font-semibold tabular-nums text-white">

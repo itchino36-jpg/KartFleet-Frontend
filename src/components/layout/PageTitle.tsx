@@ -9,7 +9,7 @@ export default function PageTitle({
 }: PageTitleProps) {
   return (
     <div className="mb-6">
-      <h1 className="text-2xl font-bold text-slate-800">
+      <h1 className="text-2xl font-semibold text-slate-950">
         {title}
       </h1>
 

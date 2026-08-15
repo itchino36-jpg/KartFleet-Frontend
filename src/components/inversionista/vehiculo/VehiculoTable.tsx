@@ -54,37 +54,14 @@ export function VehiculoTable({
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-slate-500">
-              <th className="px-3 py-3 font-medium">
-                Inversionista
-              </th>
-
-              <th className="px-3 py-3 font-medium">
-                Placa
-              </th>
-
-              <th className="px-3 py-3 font-medium">
-                Marca
-              </th>
-
-              <th className="px-3 py-3 font-medium">
-                Modelo
-              </th>
-
-              <th className="px-3 py-3 font-medium">
-                Año
-              </th>
-
-              <th className="px-3 py-3 font-medium">
-                Color
-              </th>
-
-              <th className="px-3 py-3 font-medium">
-                Tipo
-              </th>
-
-              <th className="px-3 py-3 font-medium">
-                Acciones
-              </th>
+              <th className="px-3 py-3 font-medium">Inversionista</th>
+              <th className="px-3 py-3 font-medium">Placa</th>
+              <th className="px-3 py-3 font-medium">Marca</th>
+              <th className="px-3 py-3 font-medium">Modelo</th>
+              <th className="px-3 py-3 font-medium">Año</th>
+              <th className="px-3 py-3 font-medium">color</th>
+              <th className="px-3 py-3 font-medium">Tipo</th>
+              <th className="px-3 py-3 font-medium">Acciones</th>
             </tr>
           </thead>
 
@@ -100,29 +77,12 @@ export function VehiculoTable({
                   )}
                 </td>
 
-                <td className="px-3 py-3 font-medium text-slate-900">
-                  {vehiculo.placa}
-                </td>
-
-                <td className="px-3 py-3 text-slate-600">
-                  {vehiculo.marca}
-                </td>
-
-                <td className="px-3 py-3 text-slate-600">
-                  {vehiculo.modelo}
-                </td>
-
-                <td className="px-3 py-3 text-slate-600">
-                  {vehiculo.año}
-                </td>
-
-                <td className="px-3 py-3 text-slate-600">
-                  {vehiculo.color}
-                </td>
-
-                <td className="px-3 py-3 text-slate-600">
-                  {vehiculo.tipo}
-                </td>
+                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.placa}</td>
+                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.marca}</td>
+                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.modelo}</td>
+                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.año}</td>
+                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.color}</td>
+                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.tipo}</td>
 
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-2">

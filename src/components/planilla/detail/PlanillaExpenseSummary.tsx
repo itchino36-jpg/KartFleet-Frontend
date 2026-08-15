@@ -26,7 +26,6 @@ export default function PlanillaExpenseSummary({
         </h2>
       </div>
 
-
       <div className="mt-4 space-y-3">
 
         {expenses.map((gasto) => (
@@ -41,24 +40,17 @@ export default function PlanillaExpenseSummary({
                 {gasto.concepto}
               </p>
 
-
               <span className="text-sm font-semibold text-slate-950">
                 {money.format(gasto.monto)}
               </span>
-
             </div>
-
 
             <p className="mt-1 text-sm text-slate-600">
               {gasto.detalle}
             </p>
-
-
           </div>
         ))}
-
       </div>
-
     </div>
   );
 }

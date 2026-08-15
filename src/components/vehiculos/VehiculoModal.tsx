@@ -1,7 +1,7 @@
 "use client";
 
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
 import VehiculoForm from "./VehiculoFrom";
 
 interface VehiculoModalProps {
@@ -9,7 +9,7 @@ interface VehiculoModalProps {
   inversionistas: Inversionista[];
   vehiculoInicial?: Vehiculo;
   onClose: () => void;
-  onSave: (vehiculo: Vehiculo) => void;
+  onSave: (vehiculo: Omit<Vehiculo, "id">) => void;
 }
 
 export default function VehiculoModal({

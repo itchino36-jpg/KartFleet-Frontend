@@ -61,29 +61,12 @@ export default function VehiculosTable({
                 {getInversionistaNombre(vehiculo.inversionistaId)}
               </td>
 
-              <td className="px-3 py-3 text-slate-600">
-                {vehiculo.placa}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {vehiculo.marca}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {vehiculo.modelo}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {vehiculo.año}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {vehiculo.color}
-              </td>
-
-              <td className="px-3 py-3 text-slate-600">
-                {vehiculo.tipo}
-              </td>
+              <td className="px-3 py-3 text-slate-600">{vehiculo.placa}</td>
+              <td className="px-3 py-3 text-slate-600">{vehiculo.marca}</td>
+              <td className="px-3 py-3 text-slate-600">{vehiculo.modelo}</td>
+              <td className="px-3 py-3 text-slate-600">{vehiculo.año}</td>
+              <td className="px-3 py-3 text-slate-600">{vehiculo.color}</td>
+              <td className="px-3 py-3 text-slate-600">{vehiculo.tipo}</td>
 
               <td className="px-3 py-3">
                 <div className="flex gap-2">

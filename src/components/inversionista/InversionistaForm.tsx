@@ -1,20 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-
-interface InversionistaFormData {
-  nombre: string;
-  documento: string;
-  telefono: string;
-  correo: string;
-  direccion: string;
-  placa: string;
-  marca: string;
-  modelo: string;
-  anio: string;
-  color: string;
-  tipoVehiculo: string;
-}
+import { toast } from "@/components/ui/toast";
+import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
 
 interface InversionistaFormProps {
   initialData?: Inversionista;
@@ -29,7 +18,9 @@ export default function InversionistaForm({
   onSave,
   onCancel,
 }: InversionistaFormProps) {
-  const [nombre, setNombre] = useState(initialData?.nombre ?? "");
+  const [nombre, setNombre] = useState(
+    initialData?.nombre ?? ""
+  );
   const [documento, setDocumento] = useState(
     initialData?.documento ?? ""
   );
@@ -42,27 +33,29 @@ export default function InversionistaForm({
   const [direccion, setDireccion] = useState(
     initialData?.direccion ?? ""
   );
-
-  const [placa, setPlaca] = useState("");
-  const [marca, setMarca] = useState("");
-  const [modelo, setModelo] = useState("");
-  const [anio, setAnio] = useState("");
-  const [color, setColor] = useState("");
-  const [tipoVehiculo, setTipoVehiculo] = useState("");
-
   const handleSubmit = () => {
+    if (
+      !nombre.trim() ||
+      !documento.trim() ||
+      !telefono.trim() ||
+      !correo.trim() ||
+      !direccion.trim()
+    ) {
+      toast.error("Todos los campos son obligatorios");
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(correo.trim())) {
+      toast.error("Ingresa un correo electrónico válido");
+      return;
+    }
+
     onSave({
       nombre,
       documento,
       telefono,
       correo,
       direccion,
-      placa,
-      marca,
-      modelo,
-      anio,
-      color,
-      tipoVehiculo,
     });
   };
 
@@ -165,127 +158,6 @@ export default function InversionistaForm({
         </div>
       </section>
 
-      {/* INFORMACIÓN DEL VEHÍCULO */}
-
-      {!isEditing && (
-        <section className="rounded-xl border border-slate-200 p-5">
-          <div className="mb-5">
-            <h3 className="text-lg font-semibold text-slate-950">
-              Información del vehículo
-            </h3>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Todo inversionista nuevo debe tener un
-              vehículo afiliado.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {/* PLACA */}
-
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium text-slate-700">
-                Placa
-              </span>
-
-              <input
-                type="text"
-                value={placa}
-                onChange={(event) =>
-                  setPlaca(event.target.value)
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
-              />
-            </label>
-
-            {/* MARCA */}
-
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium text-slate-700">
-                Marca
-              </span>
-
-              <input
-                type="text"
-                value={marca}
-                onChange={(event) =>
-                  setMarca(event.target.value)
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
-              />
-            </label>
-
-            {/* MODELO */}
-
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium text-slate-700">
-                Modelo
-              </span>
-
-              <input
-                type="text"
-                value={modelo}
-                onChange={(event) =>
-                  setModelo(event.target.value)
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
-              />
-            </label>
-
-            {/* AÑO */}
-
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium text-slate-700">
-                Año
-              </span>
-
-              <input
-                type="number"
-                value={anio}
-                onChange={(event) =>
-                  setAnio(event.target.value)
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
-              />
-            </label>
-
-            {/* COLOR */}
-
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium text-slate-700">
-                Color
-              </span>
-
-              <input
-                type="text"
-                value={color}
-                onChange={(event) =>
-                  setColor(event.target.value)
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
-              />
-            </label>
-
-            {/* TIPO DE VEHÍCULO */}
-
-            <label className="space-y-1.5">
-              <span className="text-sm font-medium text-slate-700">
-                Tipo de vehículo
-              </span>
-
-              <input
-                type="text"
-                value={tipoVehiculo}
-                onChange={(event) =>
-                  setTipoVehiculo(event.target.value)
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
-              />
-            </label>
-          </div>
-        </section>
-      )}
-
       {/* BOTONES */}
 
       <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
@@ -304,7 +176,7 @@ export default function InversionistaForm({
         >
           {isEditing
             ? "Guardar cambios"
-            : "Guardar"}
+            : "Siguiente"}
         </button>
       </div>
     </div>

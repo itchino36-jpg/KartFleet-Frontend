@@ -13,7 +13,7 @@ type Props = {
 
 export default function PlanillaDetailHeader({ planilla }: Props) {
   return (
-    <div className="rounded-3xl bg-[#151310] p-5 text-white shadow-sm md:p-6">
+    <div className="rounded-3xl bg-slate-950 p-5 text-white shadow-sm md:p-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm text-slate-300">

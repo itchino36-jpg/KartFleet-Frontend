@@ -48,6 +48,11 @@ export default function PlanillaPage() {
   const ingresos = planillaDetalle.reduce((accumulator, planilla) => accumulator + planilla.ingresos, 0);
   const egresos = planillaDetalle.reduce((accumulator, planilla) => accumulator + planilla.egresos, 0);
   const combustible = planillaDetalle.reduce((accumulator, planilla) => accumulator + planilla.combustible, 0);
+  const totalHorasTrabajadas = planillaDetalle.reduce(
+    (accumulator, planilla) => accumulator + parseFloat(planilla.horasTrabajadas),
+    0,
+  );
+
 
   const totalPages = Math.max(1, Math.ceil(totalPlanillas / itemsPerPage));
   const today = useMemo(() => {
@@ -89,7 +94,7 @@ export default function PlanillaPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 bg-white px-2 py-2 md:px-4">
-      <div className="overflow-hidden rounded-3xl bg-[#151310] p-5 text-white shadow-sm md:p-6">
+      <div className="overflow-hidden rounded-3xl bg-slate-950 p-5 text-white shadow-sm md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm text-slate-300">FlotaControl / Planillas</p>
@@ -121,7 +126,7 @@ export default function PlanillaPage() {
         totalPlanillas={totalPlanillas}
         enProceso={enProceso}
         balance={balance}
-        horasTrabajadas="25.5 h"
+        horasTrabajadas={`${totalHorasTrabajadas.toFixed(1)} h`}
         totalCarreras={totalCarreras}
         ingresos={ingresos}
         egresos={egresos}

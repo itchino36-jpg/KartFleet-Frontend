@@ -1,15 +1,10 @@
 import { Planilla } from "@/modules/planilla/types/planilla.types";
+import { money } from "@/modules/planilla/constants/format.constants";
 
 type Props = {
   planilla: Planilla;
   balance: number;
 };
-
-const money = new Intl.NumberFormat("es-CL", {
-  style: "currency",
-  currency: "CLP",
-  maximumFractionDigits: 0,
-});
 
 export default function PlanillaGeneralInfo({
   planilla,

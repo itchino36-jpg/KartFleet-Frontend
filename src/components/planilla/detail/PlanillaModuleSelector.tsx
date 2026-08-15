@@ -10,10 +10,7 @@ type Props = {
   onSelect: (id: string) => void;
 };
 
-export default function PlanillaModuleSelector({
-  items,
-  selectedSection,
-  onSelect,
+export default function PlanillaModuleSelector({items,selectedSection,onSelect,
 }: Props) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">

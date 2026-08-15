@@ -7,6 +7,7 @@ import {
   Wallet,
 } from "lucide-react";
 import PlanillaStatusBadge from "./PlanillaStatusBadge";
+import { money } from "@/modules/planilla/constants/format.constants";
 
 interface PlanillaCardProps {
   planilla: {
@@ -24,12 +25,6 @@ interface PlanillaCardProps {
     combustible: number;
   };
 }
-
-const money = new Intl.NumberFormat("es-CL", {
-  style: "currency",
-  currency: "CLP",
-  maximumFractionDigits: 0,
-});
 
 export default function PlanillaCard({ planilla }: PlanillaCardProps) {
   const metrics = [

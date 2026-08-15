@@ -21,6 +21,7 @@ import type { ActivityLogEntry } from "@/modules/planilla/forms/OperationsLog";
 
 import { planillaDetalle } from "@/modules/planilla/data/planilla.mock";
 import { accordionItems } from "@/modules/planilla/constants/planilla.constants";
+import { usePlanillaEntries } from "@/modules/planilla/hooks/use-planilla-entries";
 
 type PlanillaHistoryEntry =
   | HoursHistoryEntry
@@ -42,20 +43,14 @@ export default function PlanillaDetailPage() {
   const [activeModal, setActiveModal] =
     useState<string | null>(null);
 
-  const [incomeEntries, setIncomeEntries] =
-    useState<IncomeHistoryEntry[]>([]);
-
-  const [expenseEntries, setExpenseEntries] =
-    useState<ExpenseHistoryEntry[]>([]);
-
-  const [activityLogEntries, setActivityLogEntries] =
-    useState<ActivityLogEntry[]>([]);
-
-  const [hoursEntries, setHoursEntries] =
-    useState<HoursHistoryEntry[]>([]);
-
-  const [fuelEntries, setFuelEntries] =
-    useState<FuelHistoryEntry[]>([]);
+  const {
+    entries,
+    addHoursEntry,
+    addIncomeEntry,
+    addExpenseEntry,
+    addActivityLogEntry,
+    addFuelEntry,
+  } = usePlanillaEntries(planilla?.id ?? "");
 
   if (!planilla) {
     return (
@@ -92,10 +87,7 @@ export default function PlanillaDetailPage() {
   ) => {
     switch (activeModal) {
       case "hours-tracking":
-        setHoursEntries((prev) => [
-          ...prev,
-          entry as HoursHistoryEntry,
-        ]);
+        addHoursEntry(entry as HoursHistoryEntry);
 
         toast.success(
           "Registro de horas creado correctamente"
@@ -103,10 +95,7 @@ export default function PlanillaDetailPage() {
         break;
 
       case "operating-income":
-        setIncomeEntries((prev) => [
-          ...prev,
-          entry as IncomeHistoryEntry,
-        ]);
+        addIncomeEntry(entry as IncomeHistoryEntry);
 
         toast.success(
           "Ingreso operativo creado correctamente"
@@ -114,10 +103,7 @@ export default function PlanillaDetailPage() {
         break;
 
       case "operating-expenses":
-        setExpenseEntries((prev) => [
-          ...prev,
-          entry as ExpenseHistoryEntry,
-        ]);
+        addExpenseEntry(entry as ExpenseHistoryEntry);
 
         toast.success(
           "Egreso operativo creado correctamente"
@@ -125,10 +111,7 @@ export default function PlanillaDetailPage() {
         break;
 
       case "operations-log":
-        setActivityLogEntries((prev) => [
-          ...prev,
-          entry as ActivityLogEntry,
-        ]);
+        addActivityLogEntry(entry as ActivityLogEntry);
 
         toast.success(
           "Actividad de bitácora creada correctamente"
@@ -136,10 +119,7 @@ export default function PlanillaDetailPage() {
         break;
 
       case "fuel-management":
-        setFuelEntries((prev) => [
-          ...prev,
-          entry as FuelHistoryEntry,
-        ]);
+        addFuelEntry(entry as FuelHistoryEntry);
 
         toast.success(
           "Registro de combustible creado correctamente"
@@ -152,13 +132,10 @@ export default function PlanillaDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* ENCABEZADO */}
 
       <PlanillaDetailHeader
         planilla={planilla}
       />
-
-      {/* SELECTOR DE MÓDULOS */}
 
       <PlanillaModuleSelector
         items={accordionItems}
@@ -179,11 +156,11 @@ export default function PlanillaDetailPage() {
 
       <PlanillaDetailContent
         selectedSection={selectedSection}
-        hoursEntries={hoursEntries}
-        incomeEntries={incomeEntries}
-        expenseEntries={expenseEntries}
-        activityLogEntries={activityLogEntries}
-        fuelEntries={fuelEntries}
+        hoursEntries={entries.hoursEntries}
+        incomeEntries={entries.incomeEntries}
+        expenseEntries={entries.expenseEntries}
+        activityLogEntries={entries.activityLogEntries}
+        fuelEntries={entries.fuelEntries}
       />
 
       {/* MODAL PARA AGREGAR REGISTROS */}

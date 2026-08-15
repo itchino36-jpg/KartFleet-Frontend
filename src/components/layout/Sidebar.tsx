@@ -16,7 +16,7 @@ export default function Sidebar() {
   const [isInvestorOpen, setIsInvestorOpen] = useState(false);
 
   return (
-    <aside className="relative flex h-screen w-72 flex-col border-r border-slate-800 bg-[#151310] text-white">
+    <aside className="relative flex h-screen w-120 flex-col border-r border-slate-800 bg-slate-950 text-white">
       <div className="pointer-events-none absolute bottom-0 right-0 flex items-end justify-end overflow-hidden">
         <span className="translate-x-6 translate-y-6 text-[14rem] font-black tracking-tight text-slate-700/70">
           K

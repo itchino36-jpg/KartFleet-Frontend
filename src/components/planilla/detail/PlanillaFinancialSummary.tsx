@@ -16,7 +16,6 @@ export default function PlanillaFinancialSummary({
 }: PlanillaFinancialSummaryProps) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center gap-2">
           <CircleDollarSign className="h-4 w-4 text-slate-950" />
 
@@ -55,6 +54,5 @@ export default function PlanillaFinancialSummary({
 
         </div>
       </div>
-    </div>
   );
 }
