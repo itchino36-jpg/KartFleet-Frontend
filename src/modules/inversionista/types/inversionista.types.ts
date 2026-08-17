@@ -5,4 +5,5 @@ export interface Inversionista {
   telefono: string;
   correo: string;
   direccion: string;
+  createdAt?: string;
 }

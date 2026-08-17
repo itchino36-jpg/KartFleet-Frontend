@@ -38,6 +38,7 @@ export function useInversionistas() {
     const nuevoInversionista: Inversionista = {
       id: crypto.randomUUID(),
       ...datos,
+      createdAt: datos.createdAt ?? new Date().toISOString(),
     };
 
     saveInversionistas([

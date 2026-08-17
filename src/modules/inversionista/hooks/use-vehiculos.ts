@@ -25,8 +25,8 @@ export function useVehiculos() {
   ) => {
     const nuevoVehiculo = createVehiculo(vehiculo);
 
-    setVehiculos([
-      ...vehiculos,
+    setVehiculos((actuales) => [
+      ...actuales,
       nuevoVehiculo,
     ]);
   };

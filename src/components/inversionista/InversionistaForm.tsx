@@ -12,6 +12,20 @@ interface InversionistaFormProps {
   onCancel: () => void;
 }
 
+type CampoInversionista =
+  | "nombre"
+  | "documento"
+  | "telefono"
+  | "correo"
+  | "direccion";
+
+const inputClassName = (tieneError: boolean) =>
+  `w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition ${
+    tieneError
+      ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+      : "border-slate-200 focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
+  }`;
+
 export default function InversionistaForm({
   initialData,
   isEditing,
@@ -33,20 +47,42 @@ export default function InversionistaForm({
   const [direccion, setDireccion] = useState(
     initialData?.direccion ?? ""
   );
+  const [errores, setErrores] = useState<
+    Partial<Record<CampoInversionista, string>>
+  >({});
+
+  const limpiarError = (campo: CampoInversionista) => {
+    setErrores((actuales) => {
+      if (!actuales[campo]) return actuales;
+
+      const siguientes = { ...actuales };
+      delete siguientes[campo];
+      return siguientes;
+    });
+  };
+
   const handleSubmit = () => {
-    if (
-      !nombre.trim() ||
-      !documento.trim() ||
-      !telefono.trim() ||
-      !correo.trim() ||
-      !direccion.trim()
-    ) {
-      toast.error("Todos los campos son obligatorios");
-      return;
+    const nuevosErrores: Partial<Record<CampoInversionista, string>> = {};
+    const campos: Array<[CampoInversionista, string]> = [
+      ["nombre", nombre],
+      ["documento", documento],
+      ["telefono", telefono],
+      ["correo", correo],
+      ["direccion", direccion],
+    ];
+
+    campos.forEach(([campo, valor]) => {
+      if (!valor.trim()) nuevosErrores[campo] = "Necesitas rellenar este campo.";
+    });
+
+    if (correo.trim() && !/^\S+@\S+\.\S+$/.test(correo.trim())) {
+      nuevosErrores.correo = "Ingresa un correo electrónico válido.";
     }
 
-    if (!/^\S+@\S+\.\S+$/.test(correo.trim())) {
-      toast.error("Ingresa un correo electrónico válido");
+    setErrores(nuevosErrores);
+
+    if (Object.keys(nuevosErrores).length > 0) {
+      toast.error("Revisa los campos marcados en rojo");
       return;
     }
 
@@ -81,11 +117,15 @@ export default function InversionistaForm({
             <input
               type="text"
               value={nombre}
-              onChange={(event) =>
-                setNombre(event.target.value)
-              }
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
+              placeholder="Ej. Juan Pérez"
+              onChange={(event) => {
+                setNombre(event.target.value);
+                limpiarError("nombre");
+              }}
+              aria-invalid={Boolean(errores.nombre)}
+              className={inputClassName(Boolean(errores.nombre))}
             />
+            {errores.nombre && <span className="block text-xs font-medium text-red-600">{errores.nombre}</span>}
           </label>
 
           {/* DOCUMENTO */}
@@ -98,11 +138,15 @@ export default function InversionistaForm({
             <input
               type="text"
               value={documento}
-              onChange={(event) =>
-                setDocumento(event.target.value)
-              }
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
+              placeholder="Ej. 7845123"
+              onChange={(event) => {
+                setDocumento(event.target.value);
+                limpiarError("documento");
+              }}
+              aria-invalid={Boolean(errores.documento)}
+              className={inputClassName(Boolean(errores.documento))}
             />
+            {errores.documento && <span className="block text-xs font-medium text-red-600">{errores.documento}</span>}
           </label>
 
           {/* TELÉFONO */}
@@ -115,11 +159,15 @@ export default function InversionistaForm({
             <input
               type="tel"
               value={telefono}
-              onChange={(event) =>
-                setTelefono(event.target.value)
-              }
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
+              placeholder="Ej. 71234567"
+              onChange={(event) => {
+                setTelefono(event.target.value);
+                limpiarError("telefono");
+              }}
+              aria-invalid={Boolean(errores.telefono)}
+              className={inputClassName(Boolean(errores.telefono))}
             />
+            {errores.telefono && <span className="block text-xs font-medium text-red-600">{errores.telefono}</span>}
           </label>
 
           {/* CORREO */}
@@ -132,11 +180,15 @@ export default function InversionistaForm({
             <input
               type="email"
               value={correo}
-              onChange={(event) =>
-                setCorreo(event.target.value)
-              }
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
+              placeholder="Ej. nombre@gmail.com"
+              onChange={(event) => {
+                setCorreo(event.target.value);
+                limpiarError("correo");
+              }}
+              aria-invalid={Boolean(errores.correo)}
+              className={inputClassName(Boolean(errores.correo))}
             />
+            {errores.correo && <span className="block text-xs font-medium text-red-600">{errores.correo}</span>}
           </label>
 
           {/* DIRECCIÓN */}
@@ -149,11 +201,15 @@ export default function InversionistaForm({
             <input
               type="text"
               value={direccion}
-              onChange={(event) =>
-                setDireccion(event.target.value)
-              }
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
+              placeholder="Ej. Av. Principal #123"
+              onChange={(event) => {
+                setDireccion(event.target.value);
+                limpiarError("direccion");
+              }}
+              aria-invalid={Boolean(errores.direccion)}
+              className={inputClassName(Boolean(errores.direccion))}
             />
+            {errores.direccion && <span className="block text-xs font-medium text-red-600">{errores.direccion}</span>}
           </label>
         </div>
       </section>

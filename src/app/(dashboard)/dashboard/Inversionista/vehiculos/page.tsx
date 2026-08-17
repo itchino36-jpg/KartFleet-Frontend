@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 
@@ -11,10 +10,13 @@ import { VehiculoTable } from "@/components/inversionista/vehiculo/VehiculoTable
 import VehiculoModal from "@/components/vehiculos/VehiculoModal";
 import { VehiculoHeader } from "@/components/inversionista/vehiculo/VehiculoHeader";
 import { toast } from "@/components/ui/toast";
+import { DeleteVehiculoConfirmation } from "@/components/vehiculos/DeleteVehiculoConfirmation";
+import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
 
 export default function VehiculosPage() {
-  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [vehiculoAEditar, setVehiculoAEditar] = useState<Vehiculo | null>(null);
+  const [vehiculoAEliminar, setVehiculoAEliminar] = useState<Vehiculo | null>(null);
 
   const [inversionistas, setInversionistas] = useState<Inversionista[]>([]);
 
@@ -22,6 +24,7 @@ export default function VehiculosPage() {
     vehiculos,
     addVehiculo,
     deleteVehiculo,
+    updateVehiculo,
   } = useVehiculos();
 
   /*
@@ -50,30 +53,40 @@ export default function VehiculosPage() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
       {/* ENCABEZADO */}
-      <VehiculoHeader onAdd={() => setIsModalOpen(true)} />
+      <VehiculoHeader onAdd={() => {
+        setVehiculoAEditar(null);
+        setIsModalOpen(true);
+      }} />
 
       {/* TABLA */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <VehiculoTable
+      <VehiculoTable
           vehiculos={vehiculos}
           inversionistas={inversionistas}
           onEdit={(vehiculo) => {
-            router.push(
-              `/dashboard/Inversionista/vehiculos/${vehiculo.id}/edit`
-            );
+            setVehiculoAEditar(vehiculo);
+            setIsModalOpen(true);
           }}
-          onDelete={deleteVehiculo}
-        />
-      </section>
+          onDelete={(id) =>
+            setVehiculoAEliminar(
+              vehiculos.find((vehiculo) => vehiculo.id === id) ?? null
+            )
+          }
+      />
 
       {/* MODAL */}
       <VehiculoModal
+        key={vehiculoAEditar?.id ?? "nuevo-vehiculo"}
         isOpen={isModalOpen}
         inversionistas={inversionistas}
-        onClose={() => setIsModalOpen(false)}
+        vehiculoInicial={vehiculoAEditar ?? undefined}
+        onClose={() => {
+          setIsModalOpen(false);
+          setVehiculoAEditar(null);
+        }}
         onSave={(vehiculo) => {
             const plateExists = vehiculos.some(
               (item) =>
+                item.id !== vehiculoAEditar?.id &&
                 item.placa.trim().toUpperCase() ===
                 vehiculo.placa.trim().toUpperCase()
             );
@@ -83,10 +96,32 @@ export default function VehiculosPage() {
               return;
             }
 
-            addVehiculo(vehiculo);
+            if (vehiculoAEditar) {
+              updateVehiculo(vehiculoAEditar.id, vehiculo);
+              toast.success("Vehículo actualizado correctamente");
+            } else {
+              addVehiculo(vehiculo);
+              toast.success("Vehículo registrado correctamente");
+            }
             setIsModalOpen(false);
+            setVehiculoAEditar(null);
         }}
         />
+
+      <DeleteVehiculoConfirmation
+        key={vehiculoAEliminar?.id ?? "sin-vehiculo"}
+        vehiculo={vehiculoAEliminar}
+        inversionista={inversionistas.find(
+          (inversionista) => inversionista.id === vehiculoAEliminar?.inversionistaId
+        )}
+        onCancel={() => setVehiculoAEliminar(null)}
+        onConfirm={() => {
+          if (!vehiculoAEliminar) return;
+          deleteVehiculo(vehiculoAEliminar.id);
+          setVehiculoAEliminar(null);
+          toast.success("Vehículo eliminado correctamente");
+        }}
+      />
     </div>
   );
 }

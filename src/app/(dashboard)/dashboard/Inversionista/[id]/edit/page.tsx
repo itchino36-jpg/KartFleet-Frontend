@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import InversionistaForm from "@/components/inversionista/InversionistaForm";
@@ -7,12 +8,15 @@ import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionis
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
 import PageTitle from "@/components/layout/PageTitle";
+import { EditInversionistaConfirmation } from "@/components/inversionista/EditInversionistaConfirmation";
 
 export default function EditarInversionistaPage() {
   const router = useRouter();
   const params = useParams();
 
   const id = params.id as string;
+  const [actualizacionPendiente, setActualizacionPendiente] =
+    useState<Inversionista | null>(null);
 
   const {
     inversionistas,
@@ -52,11 +56,16 @@ export default function EditarInversionistaPage() {
       telefono: data.telefono.trim(),
       correo: data.correo.trim().toLowerCase(),
       direccion: data.direccion.trim(),
+      createdAt: inversionista.createdAt,
     };
 
-    updateInversionista(
-      inversionistaActualizado
-    );
+    setActualizacionPendiente(inversionistaActualizado);
+  };
+
+  const confirmUpdate = () => {
+    if (!actualizacionPendiente) return;
+
+    updateInversionista(actualizacionPendiente);
 
     toast.success(
       "Inversionista actualizado correctamente"
@@ -100,6 +109,12 @@ export default function EditarInversionistaPage() {
           onCancel={handleCancel}
         />
       </section>
+
+      <EditInversionistaConfirmation
+        inversionista={actualizacionPendiente}
+        onCancel={() => setActualizacionPendiente(null)}
+        onConfirm={confirmUpdate}
+      />
     </div>
   );
 }

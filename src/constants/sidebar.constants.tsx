@@ -1,5 +1,3 @@
-import { BriefcaseBusiness } from "lucide-react";
-
 export const sidebarItems = [
   {
     title: "Dashboard",

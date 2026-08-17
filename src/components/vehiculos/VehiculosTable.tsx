@@ -36,7 +36,7 @@ export default function VehiculosTable({
   }
 
   return (
-    <div className="overflow-x-auto">
+    
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-slate-200 text-slate-500">
@@ -91,6 +91,5 @@ export default function VehiculosTable({
           ))}
         </tbody>
       </table>
-    </div>
   );
 }
