@@ -8,6 +8,7 @@ import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionis
 import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
 import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
 import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import { normalizeInitialCapital } from "@/modules/inversionista/utils/text.utils";
 
 export type PendingVehiculo = Omit<Vehiculo, "id">;
 
@@ -38,7 +39,7 @@ export function useNuevoInversionista() {
 
   const saveInversionistaDraft = (data: InversionistaFormData) => {
     const normalizedData: InversionistaFormData = {
-      nombre: data.nombre.trim(),
+      nombre: normalizeInitialCapital(data.nombre.trim()),
       documento: data.documento.trim(),
       telefono: data.telefono.trim(),
       correo: data.correo.trim().toLowerCase(),
@@ -77,7 +78,13 @@ export function useNuevoInversionista() {
       return;
     }
 
-    const vehiculoNormalizado = { ...vehiculo, placa };
+    const vehiculoNormalizado = {
+      ...vehiculo,
+      placa,
+      marca: normalizeInitialCapital(vehiculo.marca.trim()),
+      modelo: normalizeInitialCapital(vehiculo.modelo.trim()),
+      color: normalizeInitialCapital(vehiculo.color.trim()),
+    };
 
     if (vehiculoEnEdicion) {
       setPendingVehiculos((actuales) =>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 import { toast } from "@/components/ui/toast";
 import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
+import { normalizeInitialCapital } from "@/modules/inversionista/utils/text.utils";
 
 interface InversionistaFormProps {
   initialData?: Inversionista;
@@ -33,7 +34,7 @@ export default function InversionistaForm({
   onCancel,
 }: InversionistaFormProps) {
   const [nombre, setNombre] = useState(
-    initialData?.nombre ?? ""
+    normalizeInitialCapital(initialData?.nombre ?? "")
   );
   const [documento, setDocumento] = useState(
     initialData?.documento ?? ""
@@ -87,7 +88,7 @@ export default function InversionistaForm({
     }
 
     onSave({
-      nombre,
+      nombre: normalizeInitialCapital(nombre.trim()),
       documento,
       telefono,
       correo,
@@ -119,7 +120,7 @@ export default function InversionistaForm({
               value={nombre}
               placeholder="Ej. Juan Pérez"
               onChange={(event) => {
-                setNombre(event.target.value);
+                setNombre(normalizeInitialCapital(event.target.value));
                 limpiarError("nombre");
               }}
               aria-invalid={Boolean(errores.nombre)}

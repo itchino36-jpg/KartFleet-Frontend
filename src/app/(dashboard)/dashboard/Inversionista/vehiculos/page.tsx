@@ -12,6 +12,7 @@ import { VehiculoHeader } from "@/components/inversionista/vehiculo/VehiculoHead
 import { toast } from "@/components/ui/toast";
 import { DeleteVehiculoConfirmation } from "@/components/vehiculos/DeleteVehiculoConfirmation";
 import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import { VehiculoExportButtons } from "@/modules/inversionista/components/VehiculoExportButtons";
 
 export default function VehiculosPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,10 +54,13 @@ export default function VehiculosPage() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
       {/* ENCABEZADO */}
-      <VehiculoHeader onAdd={() => {
-        setVehiculoAEditar(null);
-        setIsModalOpen(true);
-      }} />
+      <VehiculoHeader
+        exportActions={<VehiculoExportButtons vehiculos={vehiculos} inversionistas={inversionistas} />}
+        onAdd={() => {
+          setVehiculoAEditar(null);
+          setIsModalOpen(true);
+        }}
+      />
 
       {/* TABLA */}
       <VehiculoTable

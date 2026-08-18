@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "@/components/ui/toast";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import { normalizeInitialCapital } from "@/modules/inversionista/utils/text.utils";
 
 interface VehiculoFormProps {
   inversionistas: Inversionista[];
@@ -46,10 +47,10 @@ export default function VehiculoForm({
     vehiculoInicial?.inversionistaId ?? fixedInversionista?.id ?? ""
   );
   const [placa, setPlaca] = useState(vehiculoInicial?.placa ?? "");
-  const [marca, setMarca] = useState(vehiculoInicial?.marca ?? "");
-  const [modelo, setModelo] = useState(vehiculoInicial?.modelo ?? "");
+  const [marca, setMarca] = useState(normalizeInitialCapital(vehiculoInicial?.marca ?? ""));
+  const [modelo, setModelo] = useState(normalizeInitialCapital(vehiculoInicial?.modelo ?? ""));
   const [año, setAño] = useState(vehiculoInicial?.año ?? "");
-  const [color, setColor] = useState(vehiculoInicial?.color ?? "");
+  const [color, setColor] = useState(normalizeInitialCapital(vehiculoInicial?.color ?? ""));
   const [tipo, setTipo] = useState(vehiculoInicial?.tipo ?? "");
   const [errores, setErrores] = useState<Partial<Record<CampoVehiculo, string>>>({});
 
@@ -93,10 +94,10 @@ export default function VehiculoForm({
     const vehiculo: Omit<Vehiculo, "id"> = {
       inversionistaId,
       placa: placa.trim().toUpperCase(),
-      marca: marca.trim(),
-      modelo: modelo.trim(),
+      marca: normalizeInitialCapital(marca.trim()),
+      modelo: normalizeInitialCapital(modelo.trim()),
       año: año.trim(),
-      color: color.trim(),
+      color: normalizeInitialCapital(color.trim()),
       tipo: tipo.trim(),
     };
 
@@ -182,7 +183,7 @@ export default function VehiculoForm({
               value={marca}
               placeholder="Ej. Toyota"
               onChange={(event) => {
-                setMarca(event.target.value);
+                setMarca(normalizeInitialCapital(event.target.value));
                 limpiarError("marca");
               }}
               aria-invalid={Boolean(errores.marca)}
@@ -201,7 +202,7 @@ export default function VehiculoForm({
               value={modelo}
               placeholder="Ej. Corolla"
               onChange={(event) => {
-                setModelo(event.target.value);
+                setModelo(normalizeInitialCapital(event.target.value));
                 limpiarError("modelo");
               }}
               aria-invalid={Boolean(errores.modelo)}
@@ -241,7 +242,7 @@ export default function VehiculoForm({
               value={color}
               placeholder="Ej. Blanco"
               onChange={(event) => {
-                setColor(event.target.value);
+                setColor(normalizeInitialCapital(event.target.value));
                 limpiarError("color");
               }}
               aria-invalid={Boolean(errores.color)}
@@ -255,17 +256,22 @@ export default function VehiculoForm({
               Tipo de vehículo
             </span>
 
-            <input
-              type="text"
+            <select
               value={tipo}
               onChange={(event) => {
                 setTipo(event.target.value);
                 limpiarError("tipo");
               }}
               aria-invalid={Boolean(errores.tipo)}
-              placeholder="Ej. Camión, automóvil, bus..."
               className={inputClassName(Boolean(errores.tipo))}
-            />
+            >
+              <option value="" disabled>
+                Seleccionar tipo de vehículo
+              </option>
+              <option value="Moto">Moto</option>
+              <option value="Auto">Auto</option>
+              <option value="Camión">Camión</option>
+            </select>
             {errores.tipo && <span className="block text-xs font-medium text-red-600">{errores.tipo}</span>}
           </label>
         </div>

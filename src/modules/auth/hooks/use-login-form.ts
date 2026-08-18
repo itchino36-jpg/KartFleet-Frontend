@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LoginFormErrors, LoginFormValues } from "../types/login.types";
+import { DEMO_USERS, ROLE_MODULES } from "@/modules/auth/constants/authorization.constants";
+import { getFirstAllowedRoute, saveSession } from "@/modules/auth/services/session.service";
 
 const initialValues: LoginFormValues = {
   email: "mario@gmail.com",
@@ -73,17 +75,33 @@ export function useLoginForm() {
 
     try {
 
-      // LOGIN TEMPORAL
-      if (
-        values.email === "mario@gmail.com" &&
-        values.password === "12435678"
-      ) {
-        router.push("/dashboard");
-        return;
+      const demoUser = DEMO_USERS.find(
+        (user) =>
+          user.email.toLowerCase() === values.email.trim().toLowerCase() &&
+          user.password === values.password
+      );
+
+      if (!demoUser) throw new Error("Correo o contraseña incorrectos.");
+
+      if (ROLE_MODULES[demoUser.role].length === 0) {
+        throw new Error(
+          "No se puede iniciar sesión: los módulos para este rol todavía no están disponibles."
+        );
       }
 
+      const sessionUser = {
+        id: demoUser.id,
+        name: demoUser.name,
+        initials: demoUser.initials,
+        email: demoUser.email,
+        role: demoUser.role,
+      };
+      const firstRoute = getFirstAllowedRoute(sessionUser);
+      if (!firstRoute) throw new Error("No se puede iniciar sesión.");
 
-      throw new Error("Correo o contraseña incorrectos.");
+      saveSession(sessionUser, values.rememberMe);
+      router.push(firstRoute);
+      return;
 
 
     } catch (error) {

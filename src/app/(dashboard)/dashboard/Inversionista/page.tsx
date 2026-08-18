@@ -11,6 +11,7 @@ import type { Inversionista } from "@/modules/inversionista/types/inversionista.
 import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
 import { EditInversionistaModal } from "@/components/inversionista/EditInversionistaModal";
 import { EditInversionistaConfirmation } from "@/components/inversionista/EditInversionistaConfirmation";
+import { InversionistaExportButtons } from "@/modules/inversionista/components/InversionistaExportButtons";
 
 export default function InversionistaPage() {
   const router = useRouter();
@@ -103,7 +104,8 @@ export default function InversionistaPage() {
           </p>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <InversionistaExportButtons inversionistas={inversionistas} />
           <button
             type="button"
             onClick={handleAdd}

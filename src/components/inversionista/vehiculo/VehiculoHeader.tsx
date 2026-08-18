@@ -1,11 +1,15 @@
 // src/components/inversionista/vehiculo/VehiculoHeader.tsx
 
+import type { ReactNode } from "react";
+
 interface VehiculoHeaderProps {
   onAdd: () => void;
+  exportActions?: ReactNode;
 }
 
 export function VehiculoHeader({
   onAdd,
+  exportActions,
 }: VehiculoHeaderProps) {
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -20,13 +24,16 @@ export function VehiculoHeader({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onAdd}
-          className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-        >
-          + Agregar nuevo
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          {exportActions}
+          <button
+            type="button"
+            onClick={onAdd}
+            className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            + Agregar nuevo
+          </button>
+        </div>
       </div>
     </section>
   );

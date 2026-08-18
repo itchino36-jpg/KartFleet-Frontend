@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
@@ -121,6 +122,7 @@ export function VehiculoTable({
         <table className="w-full min-w-[900px] text-left text-sm">
           <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgb(226_232_240)]">
             <tr className="border-b border-slate-200 text-slate-500">
+              <th className="w-14 px-3 py-3 text-center font-medium">N°</th>
               <th className="px-3 py-3 font-medium">Inversionista</th>
               <th className="px-3 py-3 font-medium">Placa</th>
               <th className="px-3 py-3 font-medium">Marca</th>
@@ -136,17 +138,20 @@ export function VehiculoTable({
             {vehiculosVisibles.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="px-3 py-10 text-center text-sm text-slate-500"
                 >
                   No se encontraron vehículos por placa o inversionista.
                 </td>
               </tr>
-            ) : vehiculosVisibles.map((vehiculo) => (
+            ) : vehiculosVisibles.map((vehiculo, index) => (
               <tr
                 key={vehiculo.id}
                 className="h-14 border-b border-slate-100 last:border-0"
               >
+                <td className="px-3 py-3 text-center font-medium text-slate-500">
+                  {indiceInicial + index + 1}
+                </td>
                 <td className="px-3 py-3 font-medium text-slate-900">
                   {getInversionistaNombre(
                     vehiculo.inversionistaId
@@ -166,9 +171,11 @@ export function VehiculoTable({
                       <button
                         type="button"
                         onClick={() => onEdit(vehiculo)}
-                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                        aria-label={`Editar vehículo ${vehiculo.placa}`}
+                        title="Editar"
+                        className="rounded-lg border border-slate-200 p-2 text-slate-900 transition hover:bg-slate-100"
                       >
-                        Editar
+                        <Pencil className="h-4 w-4" />
                       </button>
                     )}
 
@@ -176,9 +183,11 @@ export function VehiculoTable({
                       <button
                         type="button"
                         onClick={() => onDelete(vehiculo.id)}
-                        className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                        aria-label={`Eliminar vehículo ${vehiculo.placa}`}
+                        title="Eliminar"
+                        className="rounded-lg border border-red-200 p-2 text-red-600 transition hover:bg-red-50"
                       >
-                        Eliminar
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     )}
                   </div>

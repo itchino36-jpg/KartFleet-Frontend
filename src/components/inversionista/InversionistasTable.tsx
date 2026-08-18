@@ -106,6 +106,7 @@ export default function InversionistasTable({
         <table className="w-full min-w-[760px] text-left text-sm">
         <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgb(226_232_240)]">
           <tr className="border-b border-slate-200 text-slate-500">
+            <th className="w-14 px-3 py-3 text-center font-medium">N°</th>
             <th className="px-3 py-3 font-medium">Nombre</th>
             <th className="px-3 py-3 font-medium">Documento</th>
             <th className="px-3 py-3 font-medium">Telefono</th>
@@ -118,14 +119,17 @@ export default function InversionistasTable({
         <tbody>
           {inversionistasVisibles.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-3 py-10 text-center text-sm text-slate-500">
+              <td colSpan={6} className="px-3 py-10 text-center text-sm text-slate-500">
                 No se encontraron inversionistas.
               </td>
             </tr>
-          ) : inversionistasVisibles.map((inversionista) => (
+          ) : inversionistasVisibles.map((inversionista, index) => (
             <tr
               key={inversionista.id}
               className="h-14 border-b border-slate-100 last:border-0">
+              <td className="px-3 py-3 text-center font-medium text-slate-500">
+                {indiceInicial + index + 1}
+              </td>
               <td className="px-3 py-3 font-medium text-slate-900">{inversionista.nombre}</td>
               <td className="px-3 py-3 text-slate-600">{inversionista.documento}</td>
               <td className="px-3 py-3 text-slate-600">{inversionista.telefono}</td>
