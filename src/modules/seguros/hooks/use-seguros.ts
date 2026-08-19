@@ -6,15 +6,20 @@ import { createSeguro, deleteSeguro, getSeguros, updateSeguro } from "@/modules/
 
 export function useSeguros() {
   const [seguros, setSeguros] = useState<Seguro[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // El almacenamiento local solo está disponible después de montar el cliente.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSeguros(getSeguros());
+    try { setSeguros(getSeguros()); } catch (cause) { setError(cause instanceof Error ? cause.message : "No se pudieron cargar los seguros."); }
+    finally { setIsLoading(false); }
   }, []);
 
   return {
     seguros,
+    isLoading,
+    error,
     addSeguro(data: SeguroFormData) {
       const created = createSeguro(data);
       setSeguros((current) => [...current, created]);

@@ -13,7 +13,8 @@ type Props = {
 
 export default function PlanillaDetailHeader({ planilla }: Props) {
   return (
-    <div className="rounded-3xl bg-slate-950 p-5 text-white shadow-sm md:p-6">
+    <div className="relative overflow-hidden rounded-3xl bg-slate-950 p-5 text-white shadow-lg shadow-slate-950/10 md:p-7">
+      <div className="pointer-events-none absolute -right-14 -top-20 h-56 w-56 rounded-full border border-white/10 bg-white/[0.03]" />
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm text-slate-300">

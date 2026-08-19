@@ -217,7 +217,7 @@ export default function InversionistaForm({
 
       {/* BOTONES */}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+
         <button
           type="button"
           onClick={onCancel}
@@ -235,7 +235,7 @@ export default function InversionistaForm({
             ? "Guardar cambios"
             : "Siguiente"}
         </button>
-      </div>
+
     </div>
   );
 }

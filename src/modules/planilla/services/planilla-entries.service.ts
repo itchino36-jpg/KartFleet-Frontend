@@ -54,3 +54,14 @@ export function savePlanillaEntries(
     JSON.stringify(entries)
   );
 }
+
+export function getPlanillaEntryTotals(planillaId: string) {
+  const entries = getPlanillaEntries(planillaId);
+  return {
+    hasIncomeEntries: entries.incomeEntries.length > 0,
+    hasExpenseEntries: entries.expenseEntries.length > 0,
+    ingresos: entries.incomeEntries.reduce((total, entry) => total + (Number(entry.amount) || 0), 0),
+    egresos: entries.expenseEntries.reduce((total, entry) => total + (Number(entry.amount) || 0), 0),
+    totalCarreras: entries.incomeEntries.length,
+  };
+}

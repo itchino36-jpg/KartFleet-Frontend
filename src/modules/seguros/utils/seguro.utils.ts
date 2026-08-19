@@ -11,9 +11,9 @@ export function getSeguroStatus(fechaVencimiento: string): SeguroStatus {
 }
 
 export const SEGURO_STATUS_LABELS: Record<SeguroStatus, string> = {
-  vigente: "Vigente",
-  por_vencer: "Por vencer",
-  vencido: "Vencido",
+  vigente: "Activo",
+  por_vencer: "Por vencerse",
+  vencido: "Expirado",
 };
 
 export function formatDate(value: string) {

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useLoginForm } from "../hooks/use-login-form";
-import { DEMO_USERS, ROLE_LABELS } from "@/modules/auth/constants/authorization.constants";
 
 export function LoginForm() {
   const {
@@ -42,23 +41,23 @@ export function LoginForm() {
 
           <div>
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="mb-1.5 block text-sm font-medium text-white/90"
             >
-              Correo electrónico
+              Usuario
             </label>
             <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="tu@empresa.com"
-              value={values.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              aria-invalid={Boolean(errors.email)}
+              id="username"
+              type="text"
+              autoComplete="username"
+              placeholder="Ingresa tu usuario"
+              value={values.username}
+              onChange={(e) => handleChange("username", e.target.value)}
+              aria-invalid={Boolean(errors.username)}
               className="w-full rounded-lg border border-white/10 bg-[#201c19] px-3.5 py-2.5 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-white/40 focus:ring-1 focus:ring-white/40"
             />
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-300">{errors.email}</p>
+            {errors.username && (
+              <p className="mt-1 text-xs text-red-300">{errors.username}</p>
             )}
           </div>
 
@@ -94,49 +93,15 @@ export function LoginForm() {
             )}
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 text-white/70">
-              <input
-                type="checkbox"
-                checked={values.rememberMe}
-                onChange={(e) => handleChange("rememberMe", e.target.checked)}
-                className="h-4 w-4 rounded border-white/20 bg-[#201c19] text-white focus:ring-white/40"
-              />
-              Recordarme
-            </label>
-          </div>
-
           <button
             type="submit"
             disabled={isSubmitting}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <LogIn size={16} />
-            {isSubmitting ? "Ingresando..." : "Ingresar"}
+            {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
           </button>
         </form>
-
-        <details className="mt-5 rounded-lg border border-white/10 bg-white/5 text-xs text-white/70">
-          <summary className="cursor-pointer px-3 py-2 font-medium text-white/90">
-            Ver usuarios de prueba
-          </summary>
-          <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
-            {DEMO_USERS.map((user) => (
-              <button
-                key={user.id}
-                type="button"
-                onClick={() => {
-                  handleChange("email", user.email);
-                  handleChange("password", user.password);
-                }}
-                className="block w-full rounded-md px-2 py-1.5 text-left transition hover:bg-white/10"
-              >
-                <span className="block font-medium text-white">{ROLE_LABELS[user.role]}</span>
-                <span>{user.email} · {user.password}</span>
-              </button>
-            ))}
-          </div>
-        </details>
 
         <div className="my-6 flex items-center gap-3">
           <span className="h-px flex-1 bg-white/15" />

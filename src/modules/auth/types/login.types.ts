@@ -1,19 +1,22 @@
 export interface LoginFormValues {
-  email: string;
+  username: string;
   password: string;
-  rememberMe: boolean;
 }
 
-
-//opcional
 export interface LoginFormErrors {
-  email?: string;
+  username?: string;
   password?: string;
+  general?: string;
 }
 
-
+export interface LoginUser {
+  userId: string;
+  username: string;
+  systemKey: string;
+}
 
 export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  user: LoginUser;
+  mustChangePassword: boolean;
 }

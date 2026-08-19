@@ -30,9 +30,9 @@ interface PlanillaTableProps {
 
 export default function PlanillaTable({ planillas }: PlanillaTableProps) {
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <Table>
-        <TableHeader className="bg-slate-50">
+    <div className="max-h-[430px] overflow-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-inner shadow-slate-100 [scrollbar-color:#94a3b8_transparent] [scrollbar-width:thin]">
+      <Table className="min-w-[980px]">
+        <TableHeader className="sticky top-0 z-10 bg-slate-50/95 shadow-[0_1px_0_#e2e8f0] backdrop-blur">
           <TableRow>
             <TableHead className="text-slate-600">Folio</TableHead>
             <TableHead className="text-slate-600">Fecha</TableHead>
@@ -47,7 +47,7 @@ export default function PlanillaTable({ planillas }: PlanillaTableProps) {
         </TableHeader>
         <TableBody>
           {planillas.map((planilla) => (
-            <TableRow key={planilla.id} className="align-top">
+            <TableRow key={planilla.id} className="group align-top transition duration-200 hover:bg-slate-50">
               <TableCell className="font-semibold text-slate-950">{planilla.folio}</TableCell>
               <TableCell className="text-slate-700">{planilla.fecha}</TableCell>
               <TableCell className="text-slate-700">{planilla.conductor}</TableCell>
@@ -65,7 +65,7 @@ export default function PlanillaTable({ planillas }: PlanillaTableProps) {
               <TableCell className="text-right">
                 <Link
                   href={`/dashboard/planilla/${planilla.id}`}
-                  className="inline-flex items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
+                  className="inline-flex items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-md"
                 >
                   {planilla.estado === "En proceso"
                     ? "Continuar"

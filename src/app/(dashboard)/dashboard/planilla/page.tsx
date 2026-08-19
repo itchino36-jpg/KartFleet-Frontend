@@ -1,12 +1,14 @@
 "use client";
 
 import { AlertTriangleIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
 import PlanillaSummary from "@/components/planilla/PlanillaSummary";
 import PlanillaTable from "@/components/planilla/PlanillaTable";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { planillaDetalle } from "@/modules/planilla/data/planilla.mock";
+import { getPlanillaEntryTotals } from "@/modules/planilla/services/planilla-entries.service";
 
 const monthMap: Record<string, number> = {
   Ene: 0,
@@ -36,19 +38,32 @@ export default function PlanillaPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [showBlockAlert, setShowBlockAlert] = useState(false);
+  const [planillas, setPlanillas] = useState(planillaDetalle);
   const itemsPerPage = 3;
 
-  const totalPlanillas = planillaDetalle.length;
-  const enProceso = planillaDetalle.filter((item) => item.estado === "En proceso").length;
-  const balance = planillaDetalle.reduce(
+  useEffect(() => {
+    queueMicrotask(() => setPlanillas(planillaDetalle.map((planilla) => {
+      const totals = getPlanillaEntryTotals(planilla.id);
+      return {
+        ...planilla,
+        ingresos: totals.hasIncomeEntries ? totals.ingresos : planilla.ingresos,
+        egresos: totals.hasExpenseEntries ? totals.egresos : planilla.egresos,
+        totalCarreras: totals.hasIncomeEntries ? totals.totalCarreras : planilla.totalCarreras,
+      };
+    })));
+  }, []);
+
+  const totalPlanillas = planillas.length;
+  const enProceso = planillas.filter((item) => item.estado === "En proceso").length;
+  const balance = planillas.reduce(
     (accumulator, planilla) => accumulator + planilla.ingresos - planilla.egresos - planilla.combustible,
     0,
   );
-  const totalCarreras = planillaDetalle.reduce((accumulator, planilla) => accumulator + planilla.totalCarreras, 0);
-  const ingresos = planillaDetalle.reduce((accumulator, planilla) => accumulator + planilla.ingresos, 0);
-  const egresos = planillaDetalle.reduce((accumulator, planilla) => accumulator + planilla.egresos, 0);
-  const combustible = planillaDetalle.reduce((accumulator, planilla) => accumulator + planilla.combustible, 0);
-  const totalHorasTrabajadas = planillaDetalle.reduce(
+  const totalCarreras = planillas.reduce((accumulator, planilla) => accumulator + planilla.totalCarreras, 0);
+  const ingresos = planillas.reduce((accumulator, planilla) => accumulator + planilla.ingresos, 0);
+  const egresos = planillas.reduce((accumulator, planilla) => accumulator + planilla.egresos, 0);
+  const combustible = planillas.reduce((accumulator, planilla) => accumulator + planilla.combustible, 0);
+  const totalHorasTrabajadas = planillas.reduce(
     (accumulator, planilla) => accumulator + parseFloat(planilla.horasTrabajadas),
     0,
   );
@@ -62,8 +77,8 @@ export default function PlanillaPage() {
   }, []);
 
   const inProgressPlanilla = useMemo(() => {
-    return planillaDetalle.find((planilla) => planilla.estado === "En proceso") ?? null;
-  }, []);
+    return planillas.find((planilla) => planilla.estado === "En proceso") ?? null;
+  }, [planillas]);
 
   const expiredPlanilla = useMemo(() => {
     if (!inProgressPlanilla) {
@@ -75,8 +90,8 @@ export default function PlanillaPage() {
 
   const visiblePlanillas = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return planillaDetalle.slice(startIndex, startIndex + itemsPerPage);
-  }, [currentPage]);
+    return planillas.slice(startIndex, startIndex + itemsPerPage);
+  }, [currentPage, planillas]);
 
   const handleCreatePlanilla = () => {
     if (inProgressPlanilla) {
@@ -93,8 +108,9 @@ export default function PlanillaPage() {
     : `Ya existe una planilla en proceso (${inProgressPlanilla?.folio ?? "PL-001"}). Finalízala antes de crear una nueva planilla.`;
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 bg-white px-2 py-2 md:px-4">
-      <div className="overflow-hidden rounded-3xl bg-slate-950 p-5 text-white shadow-sm md:p-6">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mx-auto w-full max-w-7xl space-y-6 pb-8">
+      <div className="relative overflow-hidden rounded-3xl bg-slate-950 p-5 text-white shadow-lg shadow-slate-950/10 md:p-7">
+        <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full border border-white/10 bg-white/[0.03]" />
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm text-slate-300">FlotaControl / Planillas</p>
@@ -114,13 +130,13 @@ export default function PlanillaPage() {
         </div>
       </div>
 
-      {showBlockAlert && inProgressPlanilla && (
-        <Alert className="max-w-full border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
+      <AnimatePresence>{showBlockAlert && inProgressPlanilla && (
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><Alert className="max-w-full border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
           <AlertTriangleIcon />
           <AlertTitle>Planilla en proceso</AlertTitle>
           <AlertDescription>{blockingAlertMessage}</AlertDescription>
-        </Alert>
-      )}
+        </Alert></motion.div>
+      )}</AnimatePresence>
 
       <PlanillaSummary
         totalPlanillas={totalPlanillas}
@@ -133,7 +149,7 @@ export default function PlanillaPage() {
         combustible={combustible}
       />
 
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold text-slate-950">Historial</h2>
@@ -172,6 +188,6 @@ export default function PlanillaPage() {
           </div>
         )}
       </section>
-    </div>
+    </motion.div>
   );
 }

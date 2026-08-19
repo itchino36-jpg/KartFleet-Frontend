@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useParams } from "next/navigation";
 import { toast } from "@/components/ui/toast";
+import { AnimatePresence, motion } from "motion/react";
 
 import PlanillaDetailHeader from "@/components/planilla/detail/PlanillaDetailHeader";
 import PlanillaModuleSelector from "@/components/planilla/detail/PlanillaModuleSelector";
@@ -36,6 +37,7 @@ export default function PlanillaDetailPage() {
   const planilla = planillaDetalle.find(
     (item) => item.id === id
   );
+  const isFinalized = planilla?.estado === "Finalizada";
 
   const [selectedSection, setSelectedSection] =
     useState("hours-tracking");
@@ -50,7 +52,7 @@ export default function PlanillaDetailPage() {
     addExpenseEntry,
     addActivityLogEntry,
     addFuelEntry,
-  } = usePlanillaEntries(planilla?.id ?? "");
+  } = usePlanillaEntries(planilla?.id ?? "", isFinalized);
 
   if (!planilla) {
     return (
@@ -85,6 +87,11 @@ export default function PlanillaDetailPage() {
   const handleRegisterSaved = (
     entry: PlanillaHistoryEntry
   ) => {
+    if (isFinalized) {
+      toast.error("Esta planilla está finalizada y no admite nuevos registros.");
+      setActiveModal(null);
+      return;
+    }
     switch (activeModal) {
       case "hours-tracking":
         addHoursEntry(entry as HoursHistoryEntry);
@@ -131,42 +138,27 @@ export default function PlanillaDetailPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .35 }} className="mx-auto w-full max-w-7xl space-y-5 pb-8">
 
       <PlanillaDetailHeader
         planilla={planilla}
       />
 
-      <PlanillaModuleSelector
-        items={accordionItems}
-        selectedSection={selectedSection}
-        onSelect={handleSelectSection}
-      />
+      <div className="sticky top-3 z-20"><PlanillaModuleSelector items={accordionItems} selectedSection={selectedSection} onSelect={handleSelectSection} /></div>
 
       {/* CONTENIDO DEL MÓDULO */}
 
-      <PlanillaModuleContent
-        selectedSection={selectedSection}
-        onAdd={() =>
-          setActiveModal(selectedSection)
-        }
-      />
+      {isFinalized && <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700"><strong>Planilla finalizada.</strong> Los datos están cerrados y disponibles únicamente para consulta.</div>}
+      <AnimatePresence mode="wait"><motion.div key={`heading-${selectedSection}`} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: .2 }}><PlanillaModuleContent selectedSection={selectedSection} readOnly={isFinalized} onAdd={isFinalized ? undefined : () => setActiveModal(selectedSection)} /></motion.div></AnimatePresence>
 
       {/* CONTENIDO DINÁMICO DE LA PLANILLA */}
 
-      <PlanillaDetailContent
-        selectedSection={selectedSection}
-        hoursEntries={entries.hoursEntries}
-        incomeEntries={entries.incomeEntries}
-        expenseEntries={entries.expenseEntries}
-        activityLogEntries={entries.activityLogEntries}
-        fuelEntries={entries.fuelEntries}
-      />
+      <AnimatePresence mode="wait"><motion.div key={selectedSection} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: .22 }} className="max-h-[560px] overflow-auto overscroll-contain rounded-2xl [scrollbar-color:#94a3b8_transparent] [scrollbar-width:thin]"><PlanillaDetailContent selectedSection={selectedSection} hoursEntries={entries.hoursEntries} incomeEntries={entries.incomeEntries} expenseEntries={entries.expenseEntries} activityLogEntries={entries.activityLogEntries} fuelEntries={entries.fuelEntries} /></motion.div></AnimatePresence>
 
       {/* MODAL PARA AGREGAR REGISTROS */}
 
       <PlanillaRegisterModal
-        open={!!modalItem}
+        open={!!modalItem && !isFinalized}
         title={modalItem?.title ?? ""}
         onClose={() => setActiveModal(null)}
       >
@@ -175,6 +167,6 @@ export default function PlanillaDetailPage() {
           onSaved={handleRegisterSaved}
         />
       </PlanillaRegisterModal>
-    </div>
+    </motion.div>
   );
 }

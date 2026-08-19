@@ -3,7 +3,8 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
@@ -167,6 +168,7 @@ export function VehiculoTable({
 
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-2">
+                    <Link href={`/dashboard/Inversionista/vehiculos/${vehiculo.id}`} aria-label={`Ver vehículo ${vehiculo.placa}`} title="Ver detalle" className="rounded-lg border border-slate-200 p-2 text-slate-900 transition hover:bg-slate-100"><Eye className="h-4 w-4" /></Link>
                     {onEdit && (
                       <button
                         type="button"

@@ -1,14 +1,23 @@
+export interface CuotaSeguro {
+  id: string;
+  mes: string;
+  monto: string;
+}
+
+export type ModalidadPagoSeguro = "contado" | "credito";
+
 export interface Seguro {
   id: string;
   vehiculoId: string;
   aseguradora: string;
-  numeroPoliza: string;
-  tipoCobertura: string;
+  numeroPoliza?: string;
+  valorAsegurado: string;
+  franquicia: string;
   fechaInicio: string;
-  fechaVencimiento: string;
-  montoAsegurado: string;
-  costoPrima: string;
-  observaciones: string;
+  fechaFin: string;
+  observaciones?: string;
+  modalidadPago: ModalidadPagoSeguro;
+  cuotas: CuotaSeguro[];
 }
 
 export type SeguroFormData = Omit<Seguro, "id">;
