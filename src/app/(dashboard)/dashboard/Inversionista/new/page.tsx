@@ -38,6 +38,7 @@ export default function NuevoInversionistaPage() {
             onDelete={flow.requestDeleteVehiculo}
             onCancelForm={flow.cancelVehicleForm}
             onFinish={flow.finish}
+            isSaving={flow.isSaving}
           />
         )}
       </section>

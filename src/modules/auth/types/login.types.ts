@@ -12,7 +12,6 @@ export interface LoginFormErrors {
 export interface LoginUser {
   userId: string;
   username: string;
-  systemKey: string;
 }
 
 export interface LoginResponse {

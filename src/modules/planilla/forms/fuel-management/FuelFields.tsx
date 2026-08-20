@@ -1,45 +1,43 @@
 import type { Dispatch, SetStateAction } from "react";
 
 type FuelFieldsProps = {
-  fuelStart: string;
-  setFuelStart: Dispatch<SetStateAction<string>>;
-  fuelEnd: string;
-  setFuelEnd: Dispatch<SetStateAction<string>>;
   odometerStart: string;
   setOdometerStart: Dispatch<SetStateAction<string>>;
   odometerEnd: string;
   setOdometerEnd: Dispatch<SetStateAction<string>>;
   observations: string;
   setObservations: Dispatch<SetStateAction<string>>;
+  errors: Partial<Record<"odometerStart" | "odometerEnd", string>>;
+  clearError: (field: "odometerStart" | "odometerEnd") => void;
   onSave: () => void;
 };
 
-const inputClassName =
-  "w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5";
+const inputClassName = (hasError: boolean) =>
+  `w-full rounded-2xl border bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 outline-none transition ${
+    hasError
+      ? "border-red-500 focus:border-red-500 focus:bg-white focus:ring-4 focus:ring-red-500/10"
+      : "border-slate-200 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5"
+  }`;
 
 export default function FuelFields({
-  fuelStart,
-  setFuelStart,
-  fuelEnd,
-  setFuelEnd,
   odometerStart,
   setOdometerStart,
   odometerEnd,
   setOdometerEnd,
   observations,
   setObservations,
+  errors,
+  clearError,
   onSave,
 }: FuelFieldsProps) {
   const fields = [
-    ["Nivel inicio", fuelStart, setFuelStart],
-    ["Nivel fin", fuelEnd, setFuelEnd],
-    ["Kilometraje inicio", odometerStart, setOdometerStart],
-    ["Kilometraje fin", odometerEnd, setOdometerEnd],
+    ["Kilometraje inicio", "odometerStart", odometerStart, setOdometerStart],
+    ["Kilometraje fin", "odometerEnd", odometerEnd, setOdometerEnd],
   ] as const;
 
   return (
     <form className="grid gap-4 sm:grid-cols-2">
-      {fields.map(([label, value, setValue]) => (
+      {fields.map(([label, field, value, setValue]) => (
         <label key={label} className="block space-y-1.5">
           <span className="text-[13px] font-medium text-slate-600">
             {label}
@@ -48,9 +46,16 @@ export default function FuelFields({
             type="number"
             min={0}
             value={value}
-            onChange={(event) => setValue(event.target.value)}
-            className={inputClassName}
+            onChange={(event) => {
+              setValue(event.target.value);
+              clearError(field);
+            }}
+            aria-invalid={Boolean(errors[field])}
+            className={inputClassName(Boolean(errors[field]))}
           />
+          {errors[field] && (
+            <span className="block text-xs font-medium text-red-600">{errors[field]}</span>
+          )}
         </label>
       ))}
 

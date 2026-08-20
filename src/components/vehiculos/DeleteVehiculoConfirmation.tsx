@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 
 interface Props {
   vehiculo: Vehiculo | null;

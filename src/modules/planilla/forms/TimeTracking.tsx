@@ -5,7 +5,7 @@
 
 import { AlertCircleIcon } from "lucide-react";
 import { useMemo } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/toast";
 
@@ -42,7 +42,7 @@ export default function HoursTracking({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     reset,
     formState: {
       errors,
@@ -58,12 +58,10 @@ export default function HoursTracking({
     arrivalVehicle,
     leaveWork,
     returnVehicle,
-  ] = watch([
-    "arrivalOffice",
-    "arrivalVehicle",
-    "leaveWork",
-    "returnVehicle",
-  ]);
+  ] = useWatch({
+    control,
+    name: ["arrivalOffice", "arrivalVehicle", "leaveWork", "returnVehicle"],
+  });
 
   const metrics = useMemo(
     () =>

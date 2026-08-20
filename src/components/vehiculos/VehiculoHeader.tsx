@@ -1,4 +1,4 @@
-// src/components/inversionista/vehiculo/VehiculoHeader.tsx
+// Encabezado principal del dominio de vehículos.
 
 import type { ReactNode } from "react";
 

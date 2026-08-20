@@ -6,7 +6,5 @@ export interface Vehiculo {
   placa: string;
   marca: string;
   modelo: string;
-  año: string;
-  color: string;
   tipo: string;
 }

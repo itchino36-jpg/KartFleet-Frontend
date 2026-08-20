@@ -1,8 +1,8 @@
 "use client";
 
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
-import VehiculoForm from "./VehiculoFrom";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
+import VehiculoForm from "./VehiculoForm";
 
 interface VehiculoModalProps {
   isOpen: boolean;

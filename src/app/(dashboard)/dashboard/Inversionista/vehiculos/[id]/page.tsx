@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Eye, ShieldCheck } from "lucide-react";
-import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
 import { useSeguros } from "@/modules/seguros/hooks/use-seguros";
 import { formatDate, formatMoney } from "@/modules/seguros/utils/seguro.utils";
 

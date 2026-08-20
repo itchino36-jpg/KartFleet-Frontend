@@ -1,5 +1,5 @@
 import type { Seguro } from "@/modules/seguros/types/seguro.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 import { formatExportDisplayDate, formatExportFilenameDate, KARFLEET_LOGO_PATH, loadImageAsDataUrl } from "@/lib/export/export.utils";
 
 export async function exportSegurosToPdf(items: Seguro[], vehicles: Vehiculo[]) {

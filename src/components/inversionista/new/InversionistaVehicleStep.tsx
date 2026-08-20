@@ -1,6 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
 
-import VehiculoForm from "@/components/vehiculos/VehiculoFrom";
+import VehiculoForm from "@/components/vehiculos/VehiculoForm";
 import type { PendingVehiculo } from "@/modules/inversionista/hooks/use-nuevo-inversionista";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 
@@ -14,11 +14,12 @@ interface Props {
   onDelete: (placa: string) => void;
   onCancelForm: () => void;
   onFinish: () => void;
+  isSaving: boolean;
 }
 
 export function InversionistaVehicleStep({
   inversionista, vehiculos, vehiculoEnEdicion, formKey, onSave,
-  onEdit, onDelete, onCancelForm, onFinish,
+  onEdit, onDelete, onCancelForm, onFinish, isSaving,
 }: Props) {
   const total = vehiculos.length;
 
@@ -32,8 +33,8 @@ export function InversionistaVehicleStep({
         <p className="text-sm text-slate-500">
           {total === 0 ? "Debes agregar al menos un vehículo para continuar." : `${total} vehículo${total === 1 ? "" : "s"} listo${total === 1 ? "" : "s"} para guardar.`}
         </p>
-        <button type="button" onClick={onFinish} disabled={total === 0} className="rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
-          Guardar
+        <button type="button" onClick={onFinish} disabled={total === 0 || isSaving} className="rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
+          {isSaving ? "Guardando..." : "Guardar"}
         </button>
       </div>
 
@@ -71,7 +72,7 @@ export function InversionistaVehicleStep({
                   <div key={vehiculo.placa} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3">
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-slate-950">{vehiculo.placa}</p>
-                      <p className="truncate text-sm text-slate-500">{vehiculo.marca} {vehiculo.modelo} · {vehiculo.año}</p>
+                      <p className="truncate text-sm text-slate-500">{vehiculo.marca} · {vehiculo.modelo}</p>
                     </div>
                     <div className="flex shrink-0 items-center gap-1">
                       <button type="button" onClick={() => onEdit(vehiculo)} aria-label={`Editar vehículo ${vehiculo.placa}`} className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 hover:text-slate-950">

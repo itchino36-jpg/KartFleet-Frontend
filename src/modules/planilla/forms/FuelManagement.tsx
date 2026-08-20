@@ -2,7 +2,7 @@
 "use client";
 
 import { AlertCircleIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   AlertDescription,
@@ -11,53 +11,46 @@ import {
 import FuelFields from "./fuel-management/FuelFields";
 import FuelSummary from "./fuel-management/FuelSummary";
 import type { FuelHistoryEntry } from "./fuel-management/fuel-management.types";
+import type { GasLevel } from "./fuel-management/GasLevelSelector";
 
 export type { FuelHistoryEntry } from "./fuel-management/fuel-management.types";
 
 type FuelManagementProps = {
   onSaved?: (entry: FuelHistoryEntry) => void;
+  vehicleType?: string;
 };
 
 export default function FuelManagement({
   onSaved,
+  vehicleType = "Auto",
 }: FuelManagementProps) {
-  const [fuelStart, setFuelStart] = useState("");
-  const [fuelEnd, setFuelEnd] = useState("");
+  const [gasolineStart, setGasolineStart] = useState(50);
+  const [gasolineEnd, setGasolineEnd] = useState(50);
+  const [gasStart, setGasStart] = useState<GasLevel>("R");
+  const [gasEnd, setGasEnd] = useState<GasLevel>("R");
   const [odometerStart, setOdometerStart] = useState("");
   const [odometerEnd, setOdometerEnd] = useState("");
   const [observations, setObservations] = useState("");
 
   const [validationMessage, setValidationMessage] =
     useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<"odometerStart" | "odometerEnd", string>>>({});
 
-  const fuelProgress = useMemo(() => {
-    const start = Number(fuelStart || 0);
-    const end = Number(fuelEnd || 0);
-
-    if (
-      !Number.isFinite(start) ||
-      !Number.isFinite(end) ||
-      start <= 0
-    ) {
-      return 0;
-    }
-
-    return Math.min(
-      100,
-      Math.max(0, (end / start) * 100)
-    );
-  }, [fuelStart, fuelEnd]);
+  const usesGas = vehicleType.toLowerCase() !== "moto";
 
   const handleSave = () => {
-    if (
-      !fuelStart.trim() ||
-      !fuelEnd.trim() ||
-      !odometerStart.trim() ||
-      !odometerEnd.trim()
-    ) {
-      setValidationMessage(
-        "Completa nivel de combustible y kilometrajes antes de guardar el registro."
-      );
+    const errors: Partial<Record<"odometerStart" | "odometerEnd", string>> = {};
+    if (!odometerStart.trim()) errors.odometerStart = "Ingresa el kilometraje inicial.";
+    else if (Number(odometerStart) < 0) errors.odometerStart = "El kilometraje no puede ser negativo.";
+    if (!odometerEnd.trim()) errors.odometerEnd = "Ingresa el kilometraje final.";
+    else if (Number(odometerEnd) < 0) errors.odometerEnd = "El kilometraje no puede ser negativo.";
+    else if (odometerStart.trim() && Number(odometerStart) > Number(odometerEnd)) {
+      errors.odometerEnd = "Debe ser igual o mayor que el kilometraje inicial.";
+    }
+
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setValidationMessage("Revisa los campos marcados en rojo antes de guardar.");
       return;
     }
 
@@ -70,8 +63,11 @@ export default function FuelManagement({
 
     const savedEntry: FuelHistoryEntry = {
       id: crypto.randomUUID(),
-      fuelStart,
-      fuelEnd,
+      fuelStart: String(gasolineStart),
+      fuelEnd: String(gasolineEnd),
+      gasStart: usesGas ? String(gasStart) : undefined,
+      gasEnd: usesGas ? String(gasEnd) : undefined,
+      vehicleType,
       odometerStart,
       odometerEnd,
       observations,
@@ -86,11 +82,14 @@ export default function FuelManagement({
      */
     onSaved?.(savedEntry);
 
-    setFuelStart("");
-    setFuelEnd("");
+    setGasolineStart(50);
+    setGasolineEnd(50);
+    setGasStart("R");
+    setGasEnd("R");
     setOdometerStart("");
     setOdometerEnd("");
     setObservations("");
+    setFieldErrors({});
   };
 
   return (
@@ -125,22 +124,34 @@ export default function FuelManagement({
       )}
 
       <FuelSummary
-        fuelStart={fuelStart}
-        fuelEnd={fuelEnd}
-        fuelProgress={fuelProgress}
+        gasolineStart={gasolineStart}
+        gasolineEnd={gasolineEnd}
+        setGasolineStart={setGasolineStart}
+        setGasolineEnd={setGasolineEnd}
+        gasStart={gasStart}
+        gasEnd={gasEnd}
+        setGasStart={setGasStart}
+        setGasEnd={setGasEnd}
+        usesGas={usesGas}
       />
 
       <FuelFields
-        fuelStart={fuelStart}
-        setFuelStart={setFuelStart}
-        fuelEnd={fuelEnd}
-        setFuelEnd={setFuelEnd}
         odometerStart={odometerStart}
         setOdometerStart={setOdometerStart}
         odometerEnd={odometerEnd}
         setOdometerEnd={setOdometerEnd}
         observations={observations}
         setObservations={setObservations}
+        errors={fieldErrors}
+        clearError={(field) => {
+          setFieldErrors((current) => {
+            if (!current[field]) return current;
+            const next = { ...current };
+            delete next[field];
+            return next;
+          });
+          setValidationMessage(null);
+        }}
         onSave={handleSave}
       />
     </div>

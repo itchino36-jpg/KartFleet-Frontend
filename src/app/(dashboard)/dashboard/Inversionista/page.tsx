@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionistas";
 import InversionistasTable from "@/components/inversionista/InversionistasTable";
 import { DeleteInversionistaConfirmation } from "@/components/inversionista/DeleteInversionistaConfirmation";
-import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
+import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista.types";
 import { EditInversionistaModal } from "@/components/inversionista/EditInversionistaModal";
 import { EditInversionistaConfirmation } from "@/components/inversionista/EditInversionistaConfirmation";
-import { InversionistaExportButtons } from "@/modules/inversionista/components/InversionistaExportButtons";
+import { InversionistaExportButtons } from "@/components/inversionista/export/InversionistaExportButtons";
 
 export default function InversionistaPage() {
   const router = useRouter();
@@ -24,6 +24,7 @@ export default function InversionistaPage() {
 
   const {
     inversionistas,
+    error,
     deleteInversionista,
     updateInversionista,
   } = useInversionistas();
@@ -83,12 +84,16 @@ export default function InversionistaPage() {
     });
   };
 
-  const confirmUpdate = () => {
+  const confirmUpdate = async () => {
     if (!actualizacionPendiente) return;
-    updateInversionista(actualizacionPendiente);
-    setActualizacionPendiente(null);
-    setInversionistaAEditar(null);
-    toast.success("Inversionista actualizado correctamente");
+    try {
+      await updateInversionista(actualizacionPendiente);
+      setActualizacionPendiente(null);
+      setInversionistaAEditar(null);
+      toast.success("Inversionista actualizado correctamente");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo actualizar el inversionista");
+    }
   };
 
   return (
@@ -115,6 +120,12 @@ export default function InversionistaPage() {
         </div>
       </div>
       </section>
+
+      {error && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       <InversionistasTable
           inversionistas={inversionistas}

@@ -6,7 +6,7 @@ import { ArrowLeft, CarFront } from "lucide-react";
 
 import PageTitle from "@/components/layout/PageTitle";
 import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionistas";
-import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
 
 export default function InversionistaDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -81,7 +81,7 @@ export default function InversionistaDetailPage() {
                     <p className="font-semibold text-slate-950">{vehiculo.placa}</p>
                   </div>
                   <p className="mt-2 text-sm text-slate-600">{vehiculo.marca} {vehiculo.modelo}</p>
-                  <p className="mt-1 text-xs text-slate-500">{vehiculo.año} · {vehiculo.color} · {vehiculo.tipo}</p>
+                  <p className="mt-1 text-xs text-slate-500">{vehiculo.tipo}</p>
                 </article>
               ))}
             </div>

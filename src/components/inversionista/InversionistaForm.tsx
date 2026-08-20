@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 import { toast } from "@/components/ui/toast";
-import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
+import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista.types";
 import { normalizeInitialCapital } from "@/modules/inversionista/utils/text.utils";
 
 interface InversionistaFormProps {
@@ -40,7 +40,7 @@ export default function InversionistaForm({
     initialData?.documento ?? ""
   );
   const [telefono, setTelefono] = useState(
-    initialData?.telefono ?? ""
+    (initialData?.telefono ?? "").replace(/^\+591\s*/, "").replace(/\D/g, "").slice(0, 8)
   );
   const [correo, setCorreo] = useState(
     initialData?.correo ?? ""
@@ -80,6 +80,10 @@ export default function InversionistaForm({
       nuevosErrores.correo = "Ingresa un correo electrónico válido.";
     }
 
+    if (telefono && !/^\d{8}$/.test(telefono)) {
+      nuevosErrores.telefono = "Ingresa exactamente 8 dígitos.";
+    }
+
     setErrores(nuevosErrores);
 
     if (Object.keys(nuevosErrores).length > 0) {
@@ -90,7 +94,7 @@ export default function InversionistaForm({
     onSave({
       nombre: normalizeInitialCapital(nombre.trim()),
       documento,
-      telefono,
+      telefono: `+591 ${telefono}`,
       correo,
       direccion,
     });
@@ -157,17 +161,28 @@ export default function InversionistaForm({
               Teléfono
             </span>
 
-            <input
-              type="tel"
-              value={telefono}
-              placeholder="Ej. 71234567"
-              onChange={(event) => {
-                setTelefono(event.target.value);
-                limpiarError("telefono");
-              }}
-              aria-invalid={Boolean(errores.telefono)}
-              className={inputClassName(Boolean(errores.telefono))}
-            />
+            <div className={`flex overflow-hidden rounded-xl border bg-white transition ${
+              errores.telefono
+                ? "border-red-500 focus-within:ring-4 focus-within:ring-red-500/10"
+                : "border-slate-200 focus-within:border-slate-900 focus-within:ring-4 focus-within:ring-slate-900/5"
+            }`}>
+              <span className="flex items-center border-r border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700">
+                +591
+              </span>
+              <input
+                type="tel"
+                inputMode="numeric"
+                value={telefono}
+                maxLength={8}
+                placeholder="00000000"
+                onChange={(event) => {
+                  setTelefono(event.target.value.replace(/\D/g, "").slice(0, 8));
+                  limpiarError("telefono");
+                }}
+                aria-invalid={Boolean(errores.telefono)}
+                className="min-w-0 flex-1 px-4 py-3 text-sm text-slate-900 outline-none"
+              />
+            </div>
             {errores.telefono && <span className="block text-xs font-medium text-red-600">{errores.telefono}</span>}
           </label>
 

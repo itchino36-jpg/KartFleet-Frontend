@@ -1,129 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-
-import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
-
-import { VehiculoTable } from "@/components/inversionista/vehiculo/VehiculoTable";
+import { useState } from "react";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
+import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionistas";
+import { VehiculoTable } from "@/components/vehiculos/VehiculoTable";
 import VehiculoModal from "@/components/vehiculos/VehiculoModal";
-import { VehiculoHeader } from "@/components/inversionista/vehiculo/VehiculoHeader";
+import { VehiculoHeader } from "@/components/vehiculos/VehiculoHeader";
 import { toast } from "@/components/ui/toast";
 import { DeleteVehiculoConfirmation } from "@/components/vehiculos/DeleteVehiculoConfirmation";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
-import { VehiculoExportButtons } from "@/modules/inversionista/components/VehiculoExportButtons";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
+import { VehiculoExportButtons } from "@/components/vehiculos/export/VehiculoExportButtons";
 
 export default function VehiculosPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [vehiculoAEditar, setVehiculoAEditar] = useState<Vehiculo | null>(null);
   const [vehiculoAEliminar, setVehiculoAEliminar] = useState<Vehiculo | null>(null);
-
-  const [inversionistas, setInversionistas] = useState<Inversionista[]>([]);
-
-  const {
-    vehiculos,
-    addVehiculo,
-    deleteVehiculo,
-    updateVehiculo,
-  } = useVehiculos();
-
-  /*
-   * Cargar inversionistas desde localStorage
-   */
-  useEffect(() => {
-    const savedInversionistas =
-      localStorage.getItem("inversionistas");
-
-    if (!savedInversionistas) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setInversionistas([]);
-      return;
-    }
-
-    try {
-      const parsedInversionistas: Inversionista[] =
-        JSON.parse(savedInversionistas);
-
-      setInversionistas(parsedInversionistas);
-    } catch {
-      setInversionistas([]);
-    }
-  }, []);
+  const { vehiculos, error: vehicleError, addVehiculo, deleteVehiculo, updateVehiculo } = useVehiculos();
+  const { inversionistas, error: investorError } = useInversionistas();
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
-      {/* ENCABEZADO */}
       <VehiculoHeader
         exportActions={<VehiculoExportButtons vehiculos={vehiculos} inversionistas={inversionistas} />}
-        onAdd={() => {
-          setVehiculoAEditar(null);
-          setIsModalOpen(true);
-        }}
+        onAdd={() => { setVehiculoAEditar(null); setIsModalOpen(true); }}
       />
 
-      {/* TABLA */}
+      {(vehicleError || investorError) && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {vehicleError ?? investorError}
+        </div>
+      )}
+
       <VehiculoTable
-          vehiculos={vehiculos}
-          inversionistas={inversionistas}
-          onEdit={(vehiculo) => {
-            setVehiculoAEditar(vehiculo);
-            setIsModalOpen(true);
-          }}
-          onDelete={(id) =>
-            setVehiculoAEliminar(
-              vehiculos.find((vehiculo) => vehiculo.id === id) ?? null
-            )
-          }
+        vehiculos={vehiculos}
+        inversionistas={inversionistas}
+        onEdit={(vehicle) => { setVehiculoAEditar(vehicle); setIsModalOpen(true); }}
+        onDelete={(id) => setVehiculoAEliminar(vehiculos.find((vehicle) => vehicle.id === id) ?? null)}
       />
 
-      {/* MODAL */}
       <VehiculoModal
         key={vehiculoAEditar?.id ?? "nuevo-vehiculo"}
         isOpen={isModalOpen}
         inversionistas={inversionistas}
         vehiculoInicial={vehiculoAEditar ?? undefined}
-        onClose={() => {
+        onClose={() => { setIsModalOpen(false); setVehiculoAEditar(null); }}
+        onSave={async (vehicle) => {
+          const plateExists = vehiculos.some((item) =>
+            item.id !== vehiculoAEditar?.id && item.placa.trim().toUpperCase() === vehicle.placa.trim().toUpperCase()
+          );
+          if (plateExists) {
+            toast.error("Ya existe un vehículo registrado con esa placa");
+            return;
+          }
+          if (vehiculoAEditar) {
+            updateVehiculo(vehiculoAEditar.id, vehicle);
+            toast.success("Vehículo actualizado en pantalla");
+          } else {
+            try {
+              await addVehiculo(vehicle);
+              toast.success("Vehículo registrado correctamente en el backend");
+            } catch (error) {
+              toast.error(error instanceof Error ? error.message : "No se pudo registrar el vehículo");
+              return;
+            }
+          }
           setIsModalOpen(false);
           setVehiculoAEditar(null);
         }}
-        onSave={(vehiculo) => {
-            const plateExists = vehiculos.some(
-              (item) =>
-                item.id !== vehiculoAEditar?.id &&
-                item.placa.trim().toUpperCase() ===
-                vehiculo.placa.trim().toUpperCase()
-            );
-
-            if (plateExists) {
-              toast.error("Ya existe un vehículo registrado con esa placa");
-              return;
-            }
-
-            if (vehiculoAEditar) {
-              updateVehiculo(vehiculoAEditar.id, vehiculo);
-              toast.success("Vehículo actualizado correctamente");
-            } else {
-              addVehiculo(vehiculo);
-              toast.success("Vehículo registrado correctamente");
-            }
-            setIsModalOpen(false);
-            setVehiculoAEditar(null);
-        }}
-        />
+      />
 
       <DeleteVehiculoConfirmation
         key={vehiculoAEliminar?.id ?? "sin-vehiculo"}
         vehiculo={vehiculoAEliminar}
-        inversionista={inversionistas.find(
-          (inversionista) => inversionista.id === vehiculoAEliminar?.inversionistaId
-        )}
+        inversionista={inversionistas.find((item) => item.id === vehiculoAEliminar?.inversionistaId)}
         onCancel={() => setVehiculoAEliminar(null)}
         onConfirm={() => {
           if (!vehiculoAEliminar) return;
           deleteVehiculo(vehiculoAEliminar.id);
           setVehiculoAEliminar(null);
-          toast.success("Vehículo eliminado correctamente");
+          toast.success("Vehículo eliminado de la pantalla");
         }}
       />
     </div>

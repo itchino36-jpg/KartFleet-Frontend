@@ -165,6 +165,7 @@ export default function PlanillaDetailPage() {
         <PlanillaModuleFormRenderer
           moduleId={activeModal ?? ""}
           onSaved={handleRegisterSaved}
+          vehicleType={planilla.tipoVehiculo}
         />
       </PlanillaRegisterModal>
     </motion.div>

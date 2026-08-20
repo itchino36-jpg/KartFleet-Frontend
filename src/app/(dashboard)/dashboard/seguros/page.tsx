@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Download, Eye, FileText, Pencil, Plus, Search, ShieldCheck, X } from "lucide-react";
 import { SeguroForm } from "@/components/seguros/SeguroForm";
 import { toast } from "@/components/ui/toast";
-import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
 import { useSeguros } from "@/modules/seguros/hooks/use-seguros";
 import type { Seguro, SeguroFormData, SeguroStatus } from "@/modules/seguros/types/seguro.types";
 import { formatDate, formatMoney, getSeguroStatus, SEGURO_STATUS_LABELS } from "@/modules/seguros/utils/seguro.utils";

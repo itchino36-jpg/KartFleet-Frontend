@@ -5,17 +5,19 @@ import { useRouter } from "next/navigation";
 
 import { toast } from "@/components/ui/toast";
 import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionistas";
-import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
-import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
+import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 import { normalizeInitialCapital } from "@/modules/inversionista/utils/text.utils";
+import { createInversionista } from "@/api/client/investor.api";
+import { createVehicle, getVehicleCatalogs } from "@/api/client/vehicle.api";
 
 export type PendingVehiculo = Omit<Vehiculo, "id">;
 
 export function useNuevoInversionista() {
   const router = useRouter();
   const { inversionistas, addInversionista } = useInversionistas();
-  const { vehiculos, addVehiculo } = useVehiculos();
+  const { vehiculos } = useVehiculos();
   const [pendingData, setPendingData] =
     useState<InversionistaFormData | null>(null);
   const [paso, setPaso] = useState<1 | 2>(1);
@@ -24,6 +26,7 @@ export function useNuevoInversionista() {
     useState<PendingVehiculo | null>(null);
   const [placaAEliminar, setPlacaAEliminar] = useState<string | null>(null);
   const [vehicleFormKey, setVehicleFormKey] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
 
   const pendingInversionista = useMemo(
     () => ({
@@ -83,7 +86,6 @@ export function useNuevoInversionista() {
       placa,
       marca: normalizeInitialCapital(vehiculo.marca.trim()),
       modelo: normalizeInitialCapital(vehiculo.modelo.trim()),
-      color: normalizeInitialCapital(vehiculo.color.trim()),
     };
 
     if (vehiculoEnEdicion) {
@@ -130,18 +132,49 @@ export function useNuevoInversionista() {
     toast.success("Vehículo eliminado de la lista");
   };
 
-  const finish = () => {
+  const finish = async () => {
     if (!pendingData || pendingVehiculos.length === 0) {
       toast.error("Debes agregar al menos un vehículo");
       return;
     }
 
-    const nuevoInversionista = addInversionista(pendingData);
-    pendingVehiculos.forEach((vehiculo) =>
-      addVehiculo({ ...vehiculo, inversionistaId: nuevoInversionista.id })
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+    const catalogs = await getVehicleCatalogs();
+    const normalizedVehicles = pendingVehiculos.map((vehicle) => {
+      const requestedType = vehicle.tipo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const typeName = requestedType === "auto" ? "automovil" : requestedType === "camion" ? "camion" : "moto";
+      const type = catalogs.types.find((item) => item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === typeName);
+      const model = catalogs.models.find((item) => item.name.trim().toLowerCase() === vehicle.modelo.trim().toLowerCase());
+      if (!type) throw new Error(`El tipo ${vehicle.tipo} no existe en el backend.`);
+      if (!model) throw new Error(`El modelo ${vehicle.modelo} no existe en el catálogo del backend.`);
+      if (model.brand.name.trim().toLowerCase() !== vehicle.marca.trim().toLowerCase()) {
+        throw new Error(`El modelo ${model.name} pertenece a la marca ${model.brand.name}.`);
+      }
+      return { vehicle, typeVehicleId: type.typeVehicleId, modelId: model.modelId };
+    });
+    const created = await createInversionista(pendingData);
+    await Promise.all(normalizedVehicles.map(({ vehicle, typeVehicleId, modelId }) =>
+      createVehicle({
+        plate: vehicle.placa,
+        typeVehicleId,
+        modelId,
+        state: 1,
+        isExternal: false,
+      })
+    ));
+    addInversionista(
+      { ...pendingData, createdAt: created.createdAt },
+      created.investorId
     );
     toast.success("Inversionista y vehículos registrados correctamente");
     router.push("/dashboard/Inversionista");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear el inversionista");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return {
@@ -152,6 +185,7 @@ export function useNuevoInversionista() {
     vehiculoEnEdicion,
     placaAEliminar,
     vehicleFormKey,
+    isSaving,
     saveInversionistaDraft,
     saveVehiculoDraft,
     editVehiculo,

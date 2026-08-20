@@ -3,12 +3,12 @@
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 
-import VehiculoForm from "@/components/vehiculos/VehiculoFrom";
+import VehiculoForm from "@/components/vehiculos/VehiculoForm";
 import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionistas";
-import { useVehiculos } from "@/modules/inversionista/hooks/use-vehiculos";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
 import PageTitle from "@/components/layout/PageTitle";
 
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 
 export default function EditarVehiculoPage() {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 import { formatExportDisplayDate, formatExportFilenameDate, KARFLEET_LOGO_PATH, loadImageAsDataUrl } from "@/lib/export/export.utils";
 
 export async function exportVehiculosToPdf(vehiculos: Vehiculo[], inversionistas: Inversionista[]) {
@@ -42,13 +42,13 @@ export async function exportVehiculosToPdf(vehiculos: Vehiculo[], inversionistas
 
   const investorName = (id: string) => inversionistas.find((item) => item.id === id)?.nombre ?? "Sin inversionista";
   const body = vehiculos.length > 0
-    ? vehiculos.map((vehicle, index) => [String(index + 1), investorName(vehicle.inversionistaId), vehicle.placa, vehicle.marca, vehicle.modelo, String(vehicle.año), vehicle.color, vehicle.tipo])
-    : [["No existen vehículos registrados", "", "", "", "", "", "", ""]];
+    ? vehiculos.map((vehicle, index) => [String(index + 1), investorName(vehicle.inversionistaId), vehicle.placa, vehicle.marca, vehicle.modelo, vehicle.tipo])
+    : [["No existen vehículos registrados", "", "", "", "", ""]];
 
   autoTable(document, {
     startY: 99,
     margin: { left: 14, right: 14, top: 14, bottom: 28 },
-    head: [["N°", "Inversionista", "Placa", "Marca", "Modelo", "Año", "Color", "Tipo"]],
+    head: [["N°", "Inversionista", "Placa", "Marca", "Modelo", "Tipo"]],
     body,
     theme: "grid",
     showHead: "everyPage",
@@ -58,12 +58,12 @@ export async function exportVehiculosToPdf(vehiculos: Vehiculo[], inversionistas
     alternateRowStyles: { fillColor: [248, 250, 252] },
     columnStyles: {
       0: { cellWidth: 8, halign: "center" }, 1: { cellWidth: 32 },
-      2: { cellWidth: 21 }, 3: { cellWidth: 23 }, 4: { cellWidth: 24 },
-      5: { cellWidth: 14, halign: "center" }, 6: { cellWidth: 24 }, 7: { cellWidth: 36 },
+      2: { cellWidth: 24 }, 3: { cellWidth: 30 }, 4: { cellWidth: 34 },
+      5: { cellWidth: 54 },
     },
     didParseCell(data) {
       if (vehiculos.length === 0 && data.section === "body" && data.column.index === 0) {
-        data.cell.colSpan = 8;
+        data.cell.colSpan = 6;
         data.cell.styles.halign = "center";
         data.cell.styles.fontStyle = "italic";
         data.cell.styles.textColor = [100, 116, 139];

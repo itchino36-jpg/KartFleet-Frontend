@@ -1,5 +1,5 @@
 import InversionistaForm from "@/components/inversionista/InversionistaForm";
-import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
+import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista.types";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
 
 interface Props {

@@ -1,7 +1,5 @@
 import type { LoginFormValues, LoginResponse } from "@/modules/auth/types/login.types";
 
-const SYSTEM_KEY = "ka-taller";
-
 function getErrorMessage(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
   const message = "message" in payload ? payload.message : null;
@@ -9,15 +7,12 @@ function getErrorMessage(payload: unknown) {
 }
 
 export async function loginWithUsernameAndPassword(values: LoginFormValues): Promise<LoginResponse> {
-  const apiUrl = process.env.NEXT_PUBLIC_AUTH_API_URL?.replace(/\/$/, "");
-  if (!apiUrl) throw new Error("El servicio de autenticación no está configurado.");
-
   let response: Response;
   try {
-    response = await fetch(`${apiUrl}/auth/login`, {
+    response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: values.username.trim(), password: values.password, systemKey: SYSTEM_KEY }),
+      body: JSON.stringify({ username: values.username.trim(), password: values.password }),
     });
   } catch {
     throw new Error("No se pudo conectar con el servidor de autenticación.");

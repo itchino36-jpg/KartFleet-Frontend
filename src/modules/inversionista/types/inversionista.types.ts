@@ -7,3 +7,5 @@ export interface Inversionista {
   direccion: string;
   createdAt?: string;
 }
+
+export type InversionistaFormData = Omit<Inversionista, "id" | "createdAt">;

@@ -25,18 +25,20 @@ export default function FuelHistory({
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-      <table className="w-full min-w-[700px] border-collapse">
+      <table className="w-full min-w-[850px] border-collapse">
         <thead>
           <tr className="border-b border-slate-200">
             <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">
               Fecha
             </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">
-              Nivel inicio
+              Gasolina salida
             </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">
-              Nivel fin
+              Gasolina llegada
             </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">Gas salida</th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">Gas llegada</th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">
               Km inicio
             </th>
@@ -58,10 +60,16 @@ export default function FuelHistory({
                 {entry.createdAt}
               </td>
               <td className="px-4 py-4 text-sm font-semibold text-slate-950">
-                {entry.fuelStart}
+                {entry.fuelStart}%
               </td>
               <td className="px-4 py-4 text-sm font-semibold text-slate-950">
-                {entry.fuelEnd}
+                {entry.fuelEnd}%
+              </td>
+              <td className="px-4 py-4 text-sm font-semibold text-slate-950">
+                {entry.gasStart ?? "—"}
+              </td>
+              <td className="px-4 py-4 text-sm font-semibold text-slate-950">
+                {entry.gasEnd ?? "—"}
               </td>
               <td className="px-4 py-4 text-sm text-slate-700">
                 {entry.odometerStart}

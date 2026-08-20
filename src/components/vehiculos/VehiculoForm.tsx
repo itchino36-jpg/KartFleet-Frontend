@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 import { normalizeInitialCapital } from "@/modules/inversionista/utils/text.utils";
+import { getVehicleCatalogs, type VehicleBrand, type VehicleModel } from "@/api/client/vehicle.api";
 
 interface VehiculoFormProps {
   inversionistas: Inversionista[];
@@ -22,8 +23,6 @@ type CampoVehiculo =
   | "placa"
   | "marca"
   | "modelo"
-  | "año"
-  | "color"
   | "tipo";
 
 const inputClassName = (tieneError: boolean) =>
@@ -49,12 +48,37 @@ export default function VehiculoForm({
   const [placa, setPlaca] = useState(vehiculoInicial?.placa ?? "");
   const [marca, setMarca] = useState(normalizeInitialCapital(vehiculoInicial?.marca ?? ""));
   const [modelo, setModelo] = useState(normalizeInitialCapital(vehiculoInicial?.modelo ?? ""));
-  const [año, setAño] = useState(vehiculoInicial?.año ?? "");
-  const [color, setColor] = useState(normalizeInitialCapital(vehiculoInicial?.color ?? ""));
   const [tipo, setTipo] = useState(vehiculoInicial?.tipo ?? "");
+  const [marcas, setMarcas] = useState<VehicleBrand[]>([]);
+  const [modelos, setModelos] = useState<VehicleModel[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [errores, setErrores] = useState<Partial<Record<CampoVehiculo, string>>>({});
 
   const modoEdicion = Boolean(vehiculoInicial);
+
+  useEffect(() => {
+    let active = true;
+    getVehicleCatalogs()
+      .then((catalogs) => {
+        if (!active) return;
+        setMarcas(catalogs.brands.filter((brand) => brand.state === 1));
+        setModelos(catalogs.models);
+      })
+      .catch((error) => {
+        if (!active) return;
+        setCatalogError(error instanceof Error ? error.message : "No se pudieron cargar marcas y modelos.");
+      })
+      .finally(() => {
+        if (active) setCatalogLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
+
+  const marcaSeleccionada = marcas.find((brand) => brand.name.toLowerCase() === marca.toLowerCase());
+  const modelosDisponibles = marcaSeleccionada
+    ? modelos.filter((model) => model.brand.brandId === marcaSeleccionada.brandId)
+    : [];
 
   const limpiarError = (campo: CampoVehiculo) => {
     setErrores((actuales) => {
@@ -75,8 +99,6 @@ export default function VehiculoForm({
       ["placa", placa],
       ["marca", marca],
       ["modelo", modelo],
-      ["año", año],
-      ["color", color],
       ["tipo", tipo],
     ];
 
@@ -96,8 +118,6 @@ export default function VehiculoForm({
       placa: placa.trim().toUpperCase(),
       marca: normalizeInitialCapital(marca.trim()),
       modelo: normalizeInitialCapital(modelo.trim()),
-      año: año.trim(),
-      color: normalizeInitialCapital(color.trim()),
       tipo: tipo.trim(),
     };
 
@@ -178,18 +198,23 @@ export default function VehiculoForm({
               Marca
             </span>
 
-            <input
-              type="text"
+            <select
               value={marca}
-              placeholder="Ej. Toyota"
+              disabled={catalogLoading || Boolean(catalogError)}
               onChange={(event) => {
-                setMarca(normalizeInitialCapital(event.target.value));
+                setMarca(event.target.value);
+                setModelo("");
                 limpiarError("marca");
+                limpiarError("modelo");
               }}
               aria-invalid={Boolean(errores.marca)}
               className={inputClassName(Boolean(errores.marca))}
-            />
+            >
+              <option value="" disabled>{catalogLoading ? "Cargando marcas..." : "Seleccionar marca"}</option>
+              {marcas.map((brand) => <option key={brand.brandId} value={brand.name}>{brand.name}</option>)}
+            </select>
             {errores.marca && <span className="block text-xs font-medium text-red-600">{errores.marca}</span>}
+            {catalogError && <span className="block text-xs font-medium text-red-600">{catalogError}</span>}
           </label>
 
           <label className="space-y-1.5">
@@ -197,58 +222,20 @@ export default function VehiculoForm({
               Modelo
             </span>
 
-            <input
-              type="text"
+            <select
               value={modelo}
-              placeholder="Ej. Corolla"
+              disabled={!marcaSeleccionada || catalogLoading || Boolean(catalogError)}
               onChange={(event) => {
-                setModelo(normalizeInitialCapital(event.target.value));
+                setModelo(event.target.value);
                 limpiarError("modelo");
               }}
               aria-invalid={Boolean(errores.modelo)}
               className={inputClassName(Boolean(errores.modelo))}
-            />
+            >
+              <option value="" disabled>{marcaSeleccionada ? "Seleccionar modelo" : "Primero selecciona una marca"}</option>
+              {modelosDisponibles.map((model) => <option key={model.modelId} value={model.name}>{model.name}</option>)}
+            </select>
             {errores.modelo && <span className="block text-xs font-medium text-red-600">{errores.modelo}</span>}
-          </label>
-
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">
-              Año
-            </span>
-
-            <input
-              type="number"
-              value={año}
-              placeholder="Ej. 2024"
-              onChange={(event) => {
-                setAño(event.target.value);
-                limpiarError("año");
-              }}
-              aria-invalid={Boolean(errores.año)}
-              min="1900"
-              max="2100"
-              className={inputClassName(Boolean(errores.año))}
-            />
-            {errores.año && <span className="block text-xs font-medium text-red-600">{errores.año}</span>}
-          </label>
-
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">
-              Color
-            </span>
-
-            <input
-              type="text"
-              value={color}
-              placeholder="Ej. Blanco"
-              onChange={(event) => {
-                setColor(normalizeInitialCapital(event.target.value));
-                limpiarError("color");
-              }}
-              aria-invalid={Boolean(errores.color)}
-              className={inputClassName(Boolean(errores.color))}
-            />
-            {errores.color && <span className="block text-xs font-medium text-red-600">{errores.color}</span>}
           </label>
 
           <label className="space-y-1.5">

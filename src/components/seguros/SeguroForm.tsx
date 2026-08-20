@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { LoaderCircle, X } from "lucide-react";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 import type { Seguro, SeguroFormData } from "@/modules/seguros/types/seguro.types";
 
 interface Props { seguro?: Seguro; vehiculos: Vehiculo[]; aseguradoras: string[]; onSave: (data: SeguroFormData) => Promise<boolean>; onClose: () => void }

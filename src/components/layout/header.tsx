@@ -92,7 +92,7 @@ export default function Header({ isSidebarOpen, onMenuClick, user }: HeaderProps
                 : "rounded-xl hover:bg-slate-100"
             }`}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm text-white sm:h-10 sm:w-10">{user.initials}</span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm text-white sm:h-10 sm:w-10">{user.initials}</span>
             <span className="hidden text-left sm:block">
               <span className="block truncate text-sm font-medium text-slate-800">{user.name}</span>
               <span className="block truncate text-xs text-slate-500">{ROLE_LABELS[user.role]}</span>

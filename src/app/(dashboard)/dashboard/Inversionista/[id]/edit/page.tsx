@@ -6,7 +6,7 @@ import { toast } from "@/components/ui/toast";
 import InversionistaForm from "@/components/inversionista/InversionistaForm";
 import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionistas";
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista-form.types";
+import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista.types";
 import PageTitle from "@/components/layout/PageTitle";
 import { EditInversionistaConfirmation } from "@/components/inversionista/EditInversionistaConfirmation";
 
@@ -62,18 +62,15 @@ export default function EditarInversionistaPage() {
     setActualizacionPendiente(inversionistaActualizado);
   };
 
-  const confirmUpdate = () => {
+  const confirmUpdate = async () => {
     if (!actualizacionPendiente) return;
-
-    updateInversionista(actualizacionPendiente);
-
-    toast.success(
-      "Inversionista actualizado correctamente"
-    );
-
-    router.push(
-      "/dashboard/Inversionista"
-    );
+    try {
+      await updateInversionista(actualizacionPendiente);
+      toast.success("Inversionista actualizado correctamente");
+      router.push("/dashboard/Inversionista");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo actualizar el inversionista");
+    }
   };
 
   const handleCancel = () => {

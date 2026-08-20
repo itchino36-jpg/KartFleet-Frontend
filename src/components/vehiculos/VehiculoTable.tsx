@@ -1,4 +1,4 @@
-// src/components/inversionista/vehiculo/VehiculoTable.tsx
+// Tabla principal del dominio de vehículos.
 
 "use client";
 
@@ -7,7 +7,7 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 
 const OPCIONES_POR_PAGINA = [6, 10, 20, 50];
 
@@ -120,7 +120,7 @@ export function VehiculoTable({
       </div>
 
       <div className="h-[385px] overflow-auto overscroll-contain rounded-xl border border-slate-100">
-        <table className="w-full min-w-[900px] text-left text-sm">
+        <table className="w-full min-w-[760px] text-left text-sm">
           <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgb(226_232_240)]">
             <tr className="border-b border-slate-200 text-slate-500">
               <th className="w-14 px-3 py-3 text-center font-medium">N°</th>
@@ -128,8 +128,6 @@ export function VehiculoTable({
               <th className="px-3 py-3 font-medium">Placa</th>
               <th className="px-3 py-3 font-medium">Marca</th>
               <th className="px-3 py-3 font-medium">Modelo</th>
-              <th className="px-3 py-3 font-medium">Año</th>
-              <th className="px-3 py-3 font-medium">color</th>
               <th className="px-3 py-3 font-medium">Tipo</th>
               <th className="px-3 py-3 font-medium">Acciones</th>
             </tr>
@@ -139,7 +137,7 @@ export function VehiculoTable({
             {vehiculosVisibles.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={7}
                   className="px-3 py-10 text-center text-sm text-slate-500"
                 >
                   No se encontraron vehículos por placa o inversionista.
@@ -162,8 +160,6 @@ export function VehiculoTable({
                 <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.placa}</td>
                 <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.marca}</td>
                 <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.modelo}</td>
-                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.año}</td>
-                <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.color}</td>
                 <td className="px-3 py-3 font-medium text-slate-900">{vehiculo.tipo}</td>
 
                 <td className="px-3 py-3">

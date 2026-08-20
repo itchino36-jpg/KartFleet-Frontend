@@ -16,6 +16,7 @@ export interface Planilla {
   arrivalOffice: string;
   conductor: string;
   movil: string;
+  tipoVehiculo: "Auto" | "Moto" | "Camión";
   estado: PlanillaStatus;
 
   horasTrabajadas: string;

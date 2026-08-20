@@ -1,5 +1,5 @@
 import type { Inversionista } from "@/modules/inversionista/types/inversionista.types";
-import type { Vehiculo } from "@/modules/inversionista/types/vehiculo.types";
+import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 import { downloadBlob, formatExportDisplayDate, formatExportFilenameDate, KARFLEET_LOGO_PATH, loadImageAsDataUrl } from "@/lib/export/export.utils";
 
 export async function exportVehiculosToExcel(vehiculos: Vehiculo[], inversionistas: Inversionista[]) {
@@ -13,15 +13,15 @@ export async function exportVehiculosToExcel(vehiculos: Vehiculo[], inversionist
   });
   sheet.columns = [
     { width: 7 }, { width: 30 }, { width: 17 }, { width: 18 },
-    { width: 20 }, { width: 11 }, { width: 17 }, { width: 22 },
+    { width: 20 }, { width: 22 },
   ];
 
-  sheet.mergeCells("B1:H1");
-  sheet.mergeCells("B2:H2");
-  sheet.mergeCells("B3:H3");
-  sheet.mergeCells("A4:H4");
+  sheet.mergeCells("B1:F1");
+  sheet.mergeCells("B2:F2");
+  sheet.mergeCells("B3:F3");
+  sheet.mergeCells("A4:F4");
   for (let row = 1; row <= 3; row += 1) {
-    for (let column = 1; column <= 8; column += 1) {
+    for (let column = 1; column <= 6; column += 1) {
       sheet.getCell(row, column).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF071A3A" } };
     }
   }
@@ -39,7 +39,7 @@ export async function exportVehiculosToExcel(vehiculos: Vehiculo[], inversionist
   const logoId = workbook.addImage({ base64: logo, extension: "png" });
   sheet.addImage(logoId, { tl: { col: 0.12, row: 0.2 }, ext: { width: 102, height: 62 } });
 
-  const headers = ["N°", "INVERSIONISTA", "PLACA", "MARCA", "MODELO", "AÑO", "COLOR", "TIPO"];
+  const headers = ["N°", "INVERSIONISTA", "PLACA", "MARCA", "MODELO", "TIPO"];
   const headerRow = sheet.getRow(6);
   headerRow.values = headers;
   headerRow.height = 25;
@@ -53,7 +53,7 @@ export async function exportVehiculosToExcel(vehiculos: Vehiculo[], inversionist
 
   const investorName = (id: string) => inversionistas.find((item) => item.id === id)?.nombre ?? "Sin inversionista";
   if (vehiculos.length === 0) {
-    sheet.mergeCells("A7:H7");
+    sheet.mergeCells("A7:F7");
     const cell = sheet.getCell("A7");
     cell.value = "No existen vehículos registrados";
     cell.alignment = { horizontal: "center", vertical: "middle" };
@@ -61,7 +61,7 @@ export async function exportVehiculosToExcel(vehiculos: Vehiculo[], inversionist
     sheet.getRow(7).height = 28;
   } else {
     vehiculos.forEach((vehicle, index) => {
-      const row = sheet.addRow([index + 1, investorName(vehicle.inversionistaId), vehicle.placa, vehicle.marca, vehicle.modelo, String(vehicle.año), vehicle.color, vehicle.tipo]);
+      const row = sheet.addRow([index + 1, investorName(vehicle.inversionistaId), vehicle.placa, vehicle.marca, vehicle.modelo, vehicle.tipo]);
       row.height = 22;
       row.eachCell((cell) => {
         cell.font = { size: 9, color: { argb: "FF334155" } };
@@ -74,17 +74,17 @@ export async function exportVehiculosToExcel(vehiculos: Vehiculo[], inversionist
   }
 
   const endRow = Math.max(7, 6 + vehiculos.length);
-  sheet.autoFilter = { from: "A6", to: `H${endRow}` };
+  sheet.autoFilter = { from: "A6", to: `F${endRow}` };
   const totalRow = endRow + 2;
-  sheet.mergeCells(`A${totalRow}:G${totalRow}`);
+  sheet.mergeCells(`A${totalRow}:E${totalRow}`);
   sheet.getCell(`A${totalRow}`).value = "TOTAL VEHÍCULOS";
-  sheet.getCell(`H${totalRow}`).value = vehiculos.length;
-  [sheet.getCell(`A${totalRow}`), sheet.getCell(`H${totalRow}`)].forEach((cell) => {
+  sheet.getCell(`F${totalRow}`).value = vehiculos.length;
+  [sheet.getCell(`A${totalRow}`), sheet.getCell(`F${totalRow}`)].forEach((cell) => {
     cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
     cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF071A3A" } };
     cell.alignment = { vertical: "middle", horizontal: "left" };
   });
-  sheet.getCell(`H${totalRow}`).alignment = { vertical: "middle", horizontal: "center" };
+  sheet.getCell(`F${totalRow}`).alignment = { vertical: "middle", horizontal: "center" };
   sheet.getRow(totalRow).height = 25;
 
   const buffer = await workbook.xlsx.writeBuffer();

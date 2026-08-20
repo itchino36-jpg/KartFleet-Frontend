@@ -5,22 +5,45 @@ import type {
 } from "@/modules/auth/types/authorization.types";
 import type { LoginUser } from "@/modules/auth/types/login.types";
 
-const SESSION_KEY = "karfleet-demo-session";
 export const ACCESS_TOKEN_KEY = "karfleet_access_token";
 export const USER_KEY = "karfleet_user";
+export const MUST_CHANGE_PASSWORD_KEY = "karfleet_must_change_password";
 
-export function saveAuthenticatedSession(accessToken: string, user: LoginUser) {
-  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
-  localStorage.removeItem(SESSION_KEY);
-  sessionStorage.removeItem(SESSION_KEY);
+type TokenPayload = {
+  exp?: number;
+  roles?: string[];
+};
+
+function readTokenPayload(token: string): TokenPayload | null {
+  try {
+    const encoded = token.split(".")[1];
+    if (!encoded) return null;
+    const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+    const normalized = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const payload = decodeURIComponent(
+      atob(normalized)
+        .split("")
+        .map((character) => `%${character.charCodeAt(0).toString(16).padStart(2, "0")}`)
+        .join("")
+    );
+    return JSON.parse(payload) as TokenPayload;
+  } catch {
+    return null;
+  }
 }
 
-export function saveSession(user: AuthUser, rememberMe: boolean) {
-  const targetStorage = rememberMe ? localStorage : sessionStorage;
-  const otherStorage = rememberMe ? sessionStorage : localStorage;
-  otherStorage.removeItem(SESSION_KEY);
-  targetStorage.setItem(SESSION_KEY, JSON.stringify(user));
+function mapBackendRole(roles: string[] = []): AuthUser["role"] {
+  const normalized = roles.map((role) => role.toLowerCase());
+  if (normalized.some((role) => role.includes("super"))) return "superadmin";
+  if (normalized.some((role) => role.includes("administrador") || role === "admin")) return "admin";
+  if (normalized.some((role) => role.includes("encargado"))) return "group_manager";
+  return "driver";
+}
+
+export function saveAuthenticatedSession(accessToken: string, user: LoginUser, mustChangePassword: boolean) {
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  localStorage.setItem(MUST_CHANGE_PASSWORD_KEY, String(mustChangePassword));
 }
 
 export function getCurrentUser(): AuthUser | null {
@@ -30,30 +53,30 @@ export function getCurrentUser(): AuthUser | null {
   if (accessToken && authenticatedUser) {
     try {
       const user = JSON.parse(authenticatedUser) as LoginUser;
+      const tokenPayload = readTokenPayload(accessToken);
+      if (!tokenPayload || (tokenPayload.exp && tokenPayload.exp * 1000 <= Date.now())) {
+        clearSession();
+        return null;
+      }
       const displayName = user.username || "Usuario";
-      return { id: user.userId, name: displayName, initials: displayName.slice(0, 2).toUpperCase(), email: displayName, role: "admin" };
+      return { id: user.userId, name: displayName, initials: displayName.slice(0, 2).toUpperCase(), email: displayName, role: mapBackendRole(tokenPayload.roles) };
     } catch {
       clearSession();
       return null;
     }
   }
-  const stored = localStorage.getItem(SESSION_KEY) ?? sessionStorage.getItem(SESSION_KEY);
-  if (!stored) return null;
-
-  try {
-    return JSON.parse(stored) as AuthUser;
-  } catch {
-    clearSession();
-    return null;
-  }
+  return null;
 }
 
 export function clearSession() {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(SESSION_KEY);
-  sessionStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(MUST_CHANGE_PASSWORD_KEY);
+}
+
+export function mustChangePassword() {
+  return typeof window !== "undefined" && localStorage.getItem(MUST_CHANGE_PASSWORD_KEY) === "true";
 }
 
 export function canAccessModule(user: AuthUser, module: SystemModule) {
