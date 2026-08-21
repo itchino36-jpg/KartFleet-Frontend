@@ -24,6 +24,11 @@ export const sidebarItems: SidebarItem[] = [
     module: "seguros",
   },
   {
+    title: "Contratos",
+    path: "/dashboard/contratos",
+    module: "contratos",
+  },
+  {
     title: "Gestión de inversionista",
     path: "/dashboard/Inversionista",
     module: "inversionistas",

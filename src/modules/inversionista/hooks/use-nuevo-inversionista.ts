@@ -9,8 +9,9 @@ import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
 import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista.types";
 import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
 import { normalizeInitialCapital } from "@/modules/inversionista/utils/text.utils";
-import { createInversionista } from "@/api/client/investor.api";
-import { createVehicle, getVehicleCatalogs } from "@/api/client/vehicle.api";
+import { createInvestorWithVehicles } from "@/api/client/investor.api";
+import { getVehicleCatalogs } from "@/api/client/vehicle.api";
+import { setVehicleInvestor } from "@/modules/vehiculo/services/vehicle-investor.service";
 
 export type PendingVehiculo = Omit<Vehiculo, "id">;
 
@@ -154,19 +155,20 @@ export function useNuevoInversionista() {
       }
       return { vehicle, typeVehicleId: type.typeVehicleId, modelId: model.modelId };
     });
-    const created = await createInversionista(pendingData);
-    await Promise.all(normalizedVehicles.map(({ vehicle, typeVehicleId, modelId }) =>
-      createVehicle({
+    const created = await createInvestorWithVehicles(
+      pendingData,
+      normalizedVehicles.map(({ vehicle, typeVehicleId, modelId }) => ({
         plate: vehicle.placa,
         typeVehicleId,
         modelId,
         state: 1,
         isExternal: false,
-      })
-    ));
+      }))
+    );
+    created.vehicles.forEach((vehicle) => setVehicleInvestor(vehicle.vehicleId, created.investor.investorId));
     addInversionista(
-      { ...pendingData, createdAt: created.createdAt },
-      created.investorId
+      { ...pendingData, createdAt: created.investor.createdAt },
+      created.investor.investorId
     );
     toast.success("Inversionista y vehículos registrados correctamente");
     router.push("/dashboard/Inversionista");

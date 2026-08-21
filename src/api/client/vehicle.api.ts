@@ -13,6 +13,8 @@ export type CreateVehiclePayload = {
 };
 export type BackendVehicle = {
   vehicleId: string;
+  investorId?: string;
+  investor?: { investorId: string };
   plate: string;
   typeVehicleId: string;
   modelId: string;
@@ -38,5 +40,21 @@ export function createVehicle(payload: CreateVehiclePayload) {
     "/api/vehicle",
     { method: "POST", body: JSON.stringify(payload) },
     "No se pudo crear el vehículo."
+  );
+}
+
+export function updateVehicle(id: string, payload: CreateVehiclePayload) {
+  return authenticatedRequest<BackendVehicle>(
+    `/api/vehicle/${encodeURIComponent(id)}`,
+    { method: "PUT", body: JSON.stringify(payload) },
+    "No se pudo actualizar el vehículo."
+  );
+}
+
+export function deleteVehicle(id: string) {
+  return authenticatedRequest<void>(
+    `/api/vehicle/${encodeURIComponent(id)}`,
+    { method: "DELETE" },
+    "No se pudo eliminar el vehículo."
   );
 }

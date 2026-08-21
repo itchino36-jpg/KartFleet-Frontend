@@ -53,8 +53,13 @@ export default function VehiculosPage() {
             return;
           }
           if (vehiculoAEditar) {
-            updateVehiculo(vehiculoAEditar.id, vehicle);
-            toast.success("Vehículo actualizado en pantalla");
+            try {
+              await updateVehiculo(vehiculoAEditar.id, vehicle);
+              toast.success("Vehículo actualizado correctamente");
+            } catch (error) {
+              toast.error(error instanceof Error ? error.message : "No se pudo actualizar el vehículo");
+              return;
+            }
           } else {
             try {
               await addVehiculo(vehicle);
@@ -74,11 +79,15 @@ export default function VehiculosPage() {
         vehiculo={vehiculoAEliminar}
         inversionista={inversionistas.find((item) => item.id === vehiculoAEliminar?.inversionistaId)}
         onCancel={() => setVehiculoAEliminar(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (!vehiculoAEliminar) return;
-          deleteVehiculo(vehiculoAEliminar.id);
-          setVehiculoAEliminar(null);
-          toast.success("Vehículo eliminado de la pantalla");
+          try {
+            await deleteVehiculo(vehiculoAEliminar.id);
+            setVehiculoAEliminar(null);
+            toast.success("Vehículo eliminado correctamente");
+          } catch (error) {
+            toast.error(error instanceof Error ? error.message : "No se pudo eliminar el vehículo");
+          }
         }}
       />
     </div>

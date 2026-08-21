@@ -8,8 +8,8 @@ export const ROLE_LABELS: Record<SystemRole, string> = {
 };
 
 export const ROLE_MODULES: Record<SystemRole, SystemModule[]> = {
-  superadmin: ["dashboard", "planilla", "inversionistas", "vehiculos", "seguros"],
-  admin: ["dashboard", "planilla", "inversionistas", "vehiculos", "seguros"],
+  superadmin: ["dashboard", "planilla", "inversionistas", "vehiculos", "seguros", "contratos"],
+  admin: ["dashboard", "planilla", "inversionistas", "vehiculos", "seguros", "contratos"],
   group_manager: [],
   driver: ["planilla"],
 };

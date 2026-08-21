@@ -10,6 +10,8 @@ export interface Seguro {
   id: string;
   vehiculoId: string;
   aseguradora: string;
+  catalogInsurerId: string;
+  catalogInsuranceStatusId: string;
   numeroPoliza?: string;
   valorAsegurado: string;
   franquicia: string;

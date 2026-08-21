@@ -40,15 +40,16 @@ export default function InversionistaPage() {
     );
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!inversionistaAEliminar) return;
-
-    vehiculos
-      .filter((vehiculo) => vehiculo.inversionistaId === inversionistaAEliminar.id)
-      .forEach((vehiculo) => deleteVehiculo(vehiculo.id));
-    deleteInversionista(inversionistaAEliminar.id);
-    setInversionistaAEliminar(null);
-    toast.success("Inversionista eliminado correctamente");
+    try {
+      await Promise.all(vehiculos.filter((vehiculo) => vehiculo.inversionistaId === inversionistaAEliminar.id).map((vehiculo) => deleteVehiculo(vehiculo.id)));
+      deleteInversionista(inversionistaAEliminar.id);
+      setInversionistaAEliminar(null);
+      toast.success("Inversionista eliminado correctamente");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron eliminar los vehículos del inversionista");
+    }
   };
 
   const cantidadVehiculos = inversionistaAEliminar

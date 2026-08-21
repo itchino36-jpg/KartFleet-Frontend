@@ -20,6 +20,7 @@ export function unauthorizedError() {
 export async function forwardJson(url: string, init: RequestInit, connectionError: string) {
   try {
     const response = await fetch(url, { ...init, cache: "no-store" });
+    if (response.status === 204) return new NextResponse(null, { status: 204 });
     const payload: unknown = await response.json().catch(() => ({ message: "El backend devolvió una respuesta inválida." }));
     return NextResponse.json(payload, { status: response.status });
   } catch {

@@ -1,5 +1,6 @@
 import { authenticatedRequest } from "@/api/client/request";
 import type { InversionistaFormData } from "@/modules/inversionista/types/inversionista.types";
+import type { BackendVehicle, CreateVehiclePayload } from "@/api/client/vehicle.api";
 
 export type InvestorResponse = {
   investorId: string;
@@ -13,20 +14,28 @@ export type InvestorResponse = {
   updatedAt: string;
 };
 
-export function createInversionista(data: InversionistaFormData) {
-  return authenticatedRequest<InvestorResponse>(
-    "/api/investor",
+export type InvestorWithVehiclesResponse = {
+  investor: InvestorResponse;
+  vehicles: BackendVehicle[];
+};
+
+export function createInvestorWithVehicles(investor: InversionistaFormData, vehicles: CreateVehiclePayload[]) {
+  return authenticatedRequest<InvestorWithVehiclesResponse>(
+    "/api/investor/with-vehicles",
     {
       method: "POST",
       body: JSON.stringify({
-        fullName: data.nombre.trim(),
-        nationalId: data.documento.trim(),
-        phone: data.telefono.trim(),
-        email: data.correo.trim().toLowerCase(),
-        address: data.direccion.trim(),
+        investor: {
+          fullName: investor.nombre.trim(),
+          nationalId: investor.documento.trim(),
+          phone: investor.telefono.trim(),
+          email: investor.correo.trim().toLowerCase(),
+          address: investor.direccion.trim(),
+        },
+        vehicles,
       }),
     },
-    "No se pudo crear el inversionista."
+    "No se pudo registrar el inversionista con sus vehículos."
   );
 }
 

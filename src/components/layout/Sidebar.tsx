@@ -10,6 +10,7 @@ import {
   X,
   UserRound,
   ShieldCheck,
+  FileSignature,
 } from "lucide-react";
 import { useState } from "react";
 import { sidebarItems } from "@/constants/sidebar.constants";
@@ -21,6 +22,7 @@ const iconMap = {
   Planilla: <IoDocumentTextOutline />,
   "Gestión de inversionista": <BriefcaseBusiness />,
   Seguros: <ShieldCheck />,
+  Contratos: <FileSignature />,
 };
 
 interface SidebarProps {

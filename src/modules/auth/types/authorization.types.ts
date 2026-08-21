@@ -9,7 +9,8 @@ export type SystemModule =
   | "planilla"
   | "inversionistas"
   | "vehiculos"
-  | "seguros";
+  | "seguros"
+  | "contratos";
 
 export interface AuthUser {
   id: string;

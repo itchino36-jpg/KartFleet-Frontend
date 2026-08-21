@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Vehiculo } from "@/modules/vehiculo/types/vehiculo.types";
-import { createVehicle, getVehicleCatalogs, getVehicles } from "@/api/client/vehicle.api";
+import { createVehicle, deleteVehicle, getVehicleCatalogs, getVehicles, updateVehicle } from "@/api/client/vehicle.api";
+import { getVehicleInvestor, removeVehicleInvestor, setVehicleInvestor } from "@/modules/vehiculo/services/vehicle-investor.service";
 
 const normalize = (value: string) => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
@@ -18,7 +19,7 @@ export function useVehiculos() {
       const type = catalogs.types.find((candidate) => candidate.typeVehicleId === item.typeVehicleId);
       return {
         id: item.vehicleId,
-        inversionistaId: "",
+        inversionistaId: item.investorId ?? item.investor?.investorId ?? getVehicleInvestor(item.vehicleId),
         placa: item.plate,
         marca: model?.brand.name ?? "—",
         modelo: model?.name ?? item.model?.name ?? "—",
@@ -48,25 +49,32 @@ export function useVehiculos() {
     const type = catalogs.types.find((item) => normalize(item.name) === requestedType);
     const model = catalogs.models.find((item) => normalize(item.name) === normalize(vehicle.modelo));
     if (!type || !model) throw new Error("El tipo o modelo seleccionado no existe en el backend.");
-    await createVehicle({
+    const created = await createVehicle({
       plate: vehicle.placa.trim().toUpperCase(),
       typeVehicleId: type.typeVehicleId,
       modelId: model.modelId,
       state: 1,
       isExternal: false,
     });
+    setVehicleInvestor(created.vehicleId, vehicle.inversionistaId);
     await load();
   };
 
-  const updateVehiculo = (id: string, data: Omit<Vehiculo, "id">) => {
-    const updated = { id, ...data };
-    setVehiculos((current) => current.map((item) => item.id === id ? updated : item));
-    return updated;
+  const updateVehiculo = async (id: string, data: Omit<Vehiculo, "id">) => {
+    const catalogs = await getVehicleCatalogs();
+    const requestedType = normalize(data.tipo) === "auto" ? "automovil" : normalize(data.tipo);
+    const type = catalogs.types.find((item) => normalize(item.name) === requestedType);
+    const model = catalogs.models.find((item) => normalize(item.name) === normalize(data.modelo));
+    if (!type || !model) throw new Error("El tipo o modelo seleccionado no existe en el backend.");
+    await updateVehicle(id, { plate: data.placa.trim().toUpperCase(), typeVehicleId: type.typeVehicleId, modelId: model.modelId, state: 1, isExternal: false });
+    setVehicleInvestor(id, data.inversionistaId);
+    await load();
   };
 
-  const deleteVehiculo = (id: string) => {
+  const deleteVehiculo = async (id: string) => {
+    await deleteVehicle(id);
+    removeVehicleInvestor(id);
     setVehiculos((current) => current.filter((item) => item.id !== id));
-    return true;
   };
 
   return { vehiculos, isLoading, error, addVehiculo, updateVehiculo, deleteVehiculo };

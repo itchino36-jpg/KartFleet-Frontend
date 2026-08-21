@@ -86,6 +86,7 @@ export function canAccessModule(user: AuthUser, module: SystemModule) {
 export function getModuleForPath(pathname: string): SystemModule {
   if (pathname.startsWith("/dashboard/Inversionista/vehiculos")) return "vehiculos";
   if (pathname.startsWith("/dashboard/seguros")) return "seguros";
+  if (pathname.startsWith("/dashboard/contratos")) return "contratos";
   if (pathname.startsWith("/dashboard/Inversionista")) return "inversionistas";
   if (pathname.startsWith("/dashboard/planilla")) return "planilla";
   return "dashboard";
@@ -98,6 +99,7 @@ export function getFirstAllowedRoute(user: AuthUser): string | null {
     ["inversionistas", "/dashboard/Inversionista"],
     ["vehiculos", "/dashboard/Inversionista/vehiculos"],
     ["seguros", "/dashboard/seguros"],
+    ["contratos", "/dashboard/contratos"],
   ];
   return routes.find(([module]) => canAccessModule(user, module))?.[1] ?? null;
 }

@@ -1,0 +1,29 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Download, FileSignature, FileText, Plus, Search } from "lucide-react";
+import { ContratoForm } from "@/components/contratos/ContratoForm";
+import { toast } from "@/components/ui/toast";
+import { useContratos } from "@/modules/contratos/hooks/use-contratos";
+import { getContratoFile } from "@/modules/contratos/services/contrato.service";
+import type { ContratoFormData } from "@/modules/contratos/types/contrato.types";
+import { useInversionistas } from "@/modules/inversionista/hooks/use-inversionistas";
+import { useVehiculos } from "@/modules/vehiculo/hooks/use-vehiculos";
+import { formatDate, formatMoney } from "@/modules/seguros/utils/seguro.utils";
+
+export default function ContratosPage() {
+  const { contratos, catalogs, isLoading, error, addContrato } = useContratos();
+  const { inversionistas, isLoading: loadingInvestors } = useInversionistas();
+  const { vehiculos, isLoading: loadingVehicles } = useVehiculos();
+  const [formOpen, setFormOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const filtered = useMemo(() => { const query = search.trim().toLowerCase(); return contratos.filter((item) => !query || [item.numeroContrato, item.tipoContrato, item.estado, inversionistas.find((investor) => investor.id === item.inversionistaId)?.nombre ?? "", vehiculos.find((vehicle) => vehicle.id === item.vehiculoId)?.placa ?? ""].some((value) => value.toLowerCase().includes(query))); }, [contratos, inversionistas, search, vehiculos]);
+  const save = async (data: ContratoFormData) => { try { await addContrato(data); toast.success("Contrato registrado correctamente"); return true; } catch (cause) { toast.error(cause instanceof Error ? cause.message : "No se pudo registrar el contrato."); return false; } };
+  const download = async (id: string, name: string) => { try { const file = await getContratoFile(id); if (!file) throw new Error("El archivo ya no está disponible en este dispositivo."); const url = URL.createObjectURL(file); const link = document.createElement("a"); link.href = url; link.download = name; link.click(); URL.revokeObjectURL(url); } catch (cause) { toast.error(cause instanceof Error ? cause.message : "No se pudo descargar el archivo."); } };
+  const loading = isLoading || loadingInvestors || loadingVehicles;
+
+  return <div className="mx-auto max-w-7xl space-y-6"><header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">Documentación</p><h1 className="mt-1 flex items-center gap-2 text-2xl font-bold"><FileSignature />Contratos</h1><p className="mt-1 text-sm text-slate-500">Contratos asociados a inversionistas y vehículos.</p></div><button onClick={() => setFormOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white"><Plus className="h-4 w-4" />Nuevo contrato</button></header>
+    <section className="overflow-hidden rounded-2xl border bg-white shadow-sm"><div className="border-b p-4"><label className="relative block"><Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" /><input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por contrato, inversionista, placa o tipo" className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-sm outline-none focus:border-slate-950" /></label></div>{loading ? <div className="space-y-3 p-5">{[1,2,3,4].map((item) => <div key={item} className="h-12 animate-pulse rounded-lg bg-slate-100" />)}</div> : error ? <p className="p-10 text-center text-red-700">{error}</p> : !filtered.length ? <div className="p-14 text-center"><FileText className="mx-auto h-10 w-10 text-slate-300" /><p className="mt-3 font-semibold">{search ? "No se encontraron contratos" : "No existen contratos registrados"}</p></div> : <div className="overflow-x-auto"><table className="w-full min-w-[1200px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr>{["N° contrato", "Inversionista", "Vehículo", "Tipo", "Vigencia", "Mensual", "Compra", "Estado", "Archivo"].map((title) => <th key={title} className="px-4 py-3">{title}</th>)}</tr></thead><tbody className="divide-y">{filtered.map((item) => <tr key={item.id} className="hover:bg-slate-50/70"><td className="px-4 py-3 font-bold">{item.numeroContrato}</td><td className="px-4 py-3">{inversionistas.find((investor) => investor.id === item.inversionistaId)?.nombre ?? "—"}</td><td className="px-4 py-3 font-semibold">{vehiculos.find((vehicle) => vehicle.id === item.vehiculoId)?.placa ?? "—"}</td><td className="px-4 py-3">{item.tipoContrato === "New" ? "Nuevo" : item.tipoContrato === "Used" ? "Usado" : item.tipoContrato}</td><td className="whitespace-nowrap px-4 py-3">{formatDate(item.fechaInicio)} — {formatDate(item.fechaFin)}</td><td className="px-4 py-3 font-semibold">{formatMoney(item.montoMensual)}</td><td className="px-4 py-3">{Number(item.montoCompra) > 0 ? formatMoney(item.montoCompra) : "—"}</td><td className="px-4 py-3"><span className="rounded-full border px-2.5 py-1 text-xs font-semibold">{item.estado === "Active" ? "Activo" : item.estado === "Finished" ? "Finalizado" : item.estado}</span></td><td className="px-4 py-3">{item.archivo ? <button onClick={() => download(item.id, item.archivo!.nombre)} className="inline-flex max-w-44 items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-slate-100" title={item.archivo.nombre}><Download className="h-4 w-4 shrink-0" /><span className="truncate">{item.archivo.nombre}</span></button> : <span className="text-xs text-slate-400">Sin archivo local</span>}</td></tr>)}</tbody></table></div>}</section>
+    {formOpen && <ContratoForm inversionistas={inversionistas} vehiculos={vehiculos} catalogs={catalogs} onSave={save} onClose={() => setFormOpen(false)} />}
+  </div>;
+}

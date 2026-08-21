@@ -1,49 +1,14 @@
+import { createInsurance, getInsurances, updateInsurance, type BackendInsurance, type InsuranceCatalogItem, type InsurancePayload } from "@/api/client/insurance.api";
 import type { Seguro, SeguroFormData } from "@/modules/seguros/types/seguro.types";
 
-const STORAGE_KEY = "seguros";
+const PAYMENT_STORAGE_KEY = "insurance-payment-details";
+type PaymentDetails = Pick<Seguro, "modalidadPago" | "cuotas" | "observaciones">;
+function paymentDetails(): Record<string, PaymentDetails> { try { return JSON.parse(localStorage.getItem(PAYMENT_STORAGE_KEY) ?? "{}") as Record<string, PaymentDetails>; } catch { return {}; } }
+function savePaymentDetails(id: string, data: SeguroFormData) { localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify({ ...paymentDetails(), [id]: { modalidadPago: data.modalidadPago, cuotas: data.cuotas, observaciones: data.observaciones } })); }
+function dateOnly(value: string) { return value.slice(0, 10); }
+function toPayload(data: SeguroFormData): InsurancePayload { return { vehicleId: data.vehiculoId, catalogInsurerId: data.catalogInsurerId, policyNumber: data.numeroPoliza?.trim().toUpperCase() ?? "", insuredValue: Number(data.valorAsegurado), deductible: Number(data.franquicia), startDate: data.fechaInicio, expirationDate: data.fechaFin, catalogInsuranceStatusId: data.catalogInsuranceStatusId }; }
+function normalize(item: BackendInsurance, insurers: InsuranceCatalogItem[]): Seguro { const payment = paymentDetails()[item.insuranceId]; return { id: item.insuranceId, vehiculoId: item.vehicleId, catalogInsurerId: item.catalogInsurerId, catalogInsuranceStatusId: item.catalogInsuranceStatusId, aseguradora: item.catalogInsurer?.name ?? item.catalogInsurer?.description ?? insurers.find((value) => value.id === item.catalogInsurerId)?.name ?? "Aseguradora no disponible", numeroPoliza: item.policyNumber, valorAsegurado: String(item.insuredValue), franquicia: String(item.deductible), fechaInicio: dateOnly(item.startDate), fechaFin: dateOnly(item.expirationDate), observaciones: payment?.observaciones ?? "", modalidadPago: payment?.modalidadPago ?? "contado", cuotas: payment?.cuotas ?? [] }; }
 
-type LegacySeguro = Partial<Seguro> & { montoAsegurado?: string; costoPrima?: string; fechaVencimiento?: string };
-
-function normalize(item: LegacySeguro): Seguro {
-  return { id: item.id ?? crypto.randomUUID(), vehiculoId: item.vehiculoId ?? "", aseguradora: item.aseguradora ?? "", numeroPoliza: item.numeroPoliza ?? "", valorAsegurado: item.valorAsegurado ?? item.montoAsegurado ?? "", franquicia: item.franquicia ?? item.costoPrima ?? "", fechaInicio: item.fechaInicio ?? "", fechaFin: item.fechaFin ?? item.fechaVencimiento ?? "", observaciones: item.observaciones ?? "", modalidadPago: item.modalidadPago ?? "contado", cuotas: Array.isArray(item.cuotas) ? item.cuotas : [] };
-}
-
-export function getSeguros(): Seguro[] {
-  if (typeof window === "undefined") return [];
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return [];
-  try {
-    return (JSON.parse(saved) as LegacySeguro[]).map(normalize);
-  } catch {
-    throw new Error("No se pudieron leer los seguros almacenados.");
-  }
-}
-
-export function getSeguroById(id: string) { return getSeguros().find((item) => item.id === id); }
-export function getSegurosByVehiculo(vehicleId: string) { return getSeguros().filter((item) => item.vehiculoId === vehicleId).sort((a, b) => b.fechaInicio.localeCompare(a.fechaInicio)); }
-
-function persist(seguros: Seguro[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(seguros));
-}
-
-export function createSeguro(data: SeguroFormData): Seguro {
-  const seguro = { id: crypto.randomUUID(), ...data };
-  persist([...getSeguros(), seguro]);
-  return seguro;
-}
-
-export function updateSeguro(id: string, data: SeguroFormData): Seguro | null {
-  const seguros = getSeguros();
-  if (!seguros.some((seguro) => seguro.id === id)) return null;
-  const updated = { id, ...data };
-  persist(seguros.map((seguro) => (seguro.id === id ? updated : seguro)));
-  return updated;
-}
-
-export function deleteSeguro(id: string): boolean {
-  const seguros = getSeguros();
-  const filtered = seguros.filter((seguro) => seguro.id !== id);
-  if (filtered.length === seguros.length) return false;
-  persist(filtered);
-  return true;
-}
+export async function getSeguros(insurers: InsuranceCatalogItem[]) { return (await getInsurances()).map((item) => normalize(item, insurers)); }
+export async function createSeguro(data: SeguroFormData, insurers: InsuranceCatalogItem[]) { const created = await createInsurance(toPayload(data)); savePaymentDetails(created.insuranceId, data); return normalize(created, insurers); }
+export async function updateSeguro(id: string, data: SeguroFormData, insurers: InsuranceCatalogItem[]) { const updated = await updateInsurance(id, toPayload(data)); savePaymentDetails(id, data); return normalize({ ...updated, insuranceId: updated.insuranceId ?? id }, insurers); }

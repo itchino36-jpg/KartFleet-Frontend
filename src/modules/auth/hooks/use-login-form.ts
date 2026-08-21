@@ -37,9 +37,6 @@ export function useLoginForm() {
     try {
       const response = await loginWithUsernameAndPassword(values);
       saveAuthenticatedSession(response.access_token, response.user, response.mustChangePassword);
-      if (process.env.NODE_ENV === "development") {
-        console.info("Token para Swagger:", `Bearer ${response.access_token}`);
-      }
       router.push("/dashboard");
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "No pudimos iniciar sesión.");

@@ -21,7 +21,7 @@ export default function EditarVehiculoPage() {
   const vehiculo =
     vehiculos.find((item) => item.id === id) ?? null;
 
-  const handleSave = (data: Omit<Vehiculo, "id">) => {
+  const handleSave = async (data: Omit<Vehiculo, "id">) => {
     if (!vehiculo) {
       return;
     }
@@ -38,11 +38,13 @@ export default function EditarVehiculoPage() {
       return;
     }
 
-    updateVehiculo(vehiculo.id, data);
-
-    toast.success("Vehículo actualizado correctamente");
-
-    router.push("/dashboard/Inversionista/vehiculos");
+    try {
+      await updateVehiculo(vehiculo.id, data);
+      toast.success("Vehículo actualizado correctamente");
+      router.push("/dashboard/Inversionista/vehiculos");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo actualizar el vehículo");
+    }
   };
 
   const handleCancel = () => {
